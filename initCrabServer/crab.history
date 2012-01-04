@@ -1,0 +1,124 @@
+100406_185221: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -cfg crab_slc5cern.cfg
+100406_185243: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -submit -c INITIATE_CREDENTIALS_CERNslc5/
+100406_185303: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -renewCredential -c INITIATE_CREDENTIALS_CERNslc5/
+100406_185453: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -renewCredential -c INITIATE_CREDENTIALS_CERNslc5/
+100406_185628: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -renewCredential -c INITIATE_CREDENTIALS_CERNslc5/
+100406_190009: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100406_190154: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100406_191800: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100406_191903: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100406_194131: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100406_215938: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100408_203324: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100408_203342: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100408_203433: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -renewCredential -c INITIATE_CREDENTIALS_CERNslc5/
+100408_203444: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100409_203351: /user/cmssoft/crab/CRAB_2_6_6/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100409_203419: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100410_120024: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100411_223142: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100411_223208: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100412_090512: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100412_090613: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100412_090626: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100412_090714: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100412_104456: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100412_184637: /user/cmssoft/crab/CRAB_2_6_6/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100412_184645: /user/cmssoft/crab/CRAB_2_6_6/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100412_184651: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100412_184704: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100413_103945: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100413_104040: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100413_104126: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100413_104217: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100413_104245: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100413_105509: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -status -c ../CMSSW_3_5_6_patch1/src/ConfigurationFiles/TTbar/dhondt-PAT_TTbar_Summer09-MC_3XY_V25_7TeV_preproduction-v2_09042010_203135-0f177c9fa3deb5c418b6d4c63fe7614d/13042010_104338/TOPTREE_dhondt-PAT_TTbar_Summer09-MC_3XY_V25_7TeV_preproduction-v2_09042010_203135-0f177c9fa3deb5c418b6d4c63fe7614d_13042010_104338/
+100413_105658: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -status -c ../CMSSW_3_5_6_patch1/src/ConfigurationFiles/TTbar/dhondt-PAT_TTbar_Summer09-MC_3XY_V25_7TeV_preproduction-v2_09042010_203135-0f177c9fa3deb5c418b6d4c63fe7614d/13042010_104338/TOPTREE_dhondt-PAT_TTbar_Summer09-MC_3XY_V25_7TeV_preproduction-v2_09042010_203135-0f177c9fa3deb5c418b6d4c63fe7614d_13042010_104338/
+100413_113200: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -status -c ../CMSSW_3_5_6_patch1/src/ConfigurationFiles/TTbar/dhondt-PAT_TTbar_Summer09-MC_3XY_V25_7TeV_preproduction-v2_09042010_203135-0f177c9fa3deb5c418b6d4c63fe7614d/13042010_104338/TOPTREE_dhondt-PAT_TTbar_Summer09-MC_3XY_V25_7TeV_preproduction-v2_09042010_203135-0f177c9fa3deb5c418b6d4c63fe7614d_13042010_104338/
+100413_121018: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -status -c ../CMSSW_3_5_6_patch1/src/ConfigurationFiles/TTbar/dhondt-PAT_TTbar_Summer09-MC_3XY_V25_7TeV_preproduction-v2_09042010_203135-0f177c9fa3deb5c418b6d4c63fe7614d/13042010_104338/TOPTREE_dhondt-PAT_TTbar_Summer09-MC_3XY_V25_7TeV_preproduction-v2_09042010_203135-0f177c9fa3deb5c418b6d4c63fe7614d_13042010_104338/
+100413_140917: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100413_143823: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -status -c ../CMSSW_3_5_6_patch1/src/ConfigurationFiles/TTbar/dhondt-PAT_TTbar_Summer09-MC_3XY_V25_7TeV_preproduction-v2_09042010_203135-0f177c9fa3deb5c418b6d4c63fe7614d/13042010_104338/TOPTREE_dhondt-PAT_TTbar_Summer09-MC_3XY_V25_7TeV_preproduction-v2_09042010_203135-0f177c9fa3deb5c418b6d4c63fe7614d_13042010_104338/
+100413_143836: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -status -c ../CMSSW_3_5_6_patch1_TopTreeProd_v10/src/ConfigurationFiles/TTbarJets-madgraph/dhondt-PAT_TTbarJets-madgraph_Summer09-MC_31X_V3_7TeV-v5_09042010_205141-f7b65dd65b478b6eda778f65a63587d3/13042010_140836/TOPTREE_dhondt-PAT_TTbarJets-madgraph_Summer09-MC_31X_V3_7TeV-v5_09042010_205141-f7b65dd65b478b6eda778f65a63587d3_13042010_140836/
+100416_110849: /user/cmssoft/crab/CRAB_2_6_6/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100416_110930: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100419_094328: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100419_203604: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100419_203646: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_095218: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_100115: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -kill all -c ../CMSSW_3_5_6_patch1_TopTreeProd_v10/src/ConfigurationFiles/Zee/Summer09-MC_31X_V3_7TeV_TrackingParticles-v1/20042010_091017/PAT_Summer09-MC_31X_V3_7TeV_TrackingParticles-v1_20042010_091017 ../CMSSW_3_5_6_patch1_TopTreeProd_v10/src/ConfigurationFiles/Zee/Summer09-MC_31X_V3_7TeV_TrackingParticles-v1/20042010_091017/Zee-Summer09-MC_31X_V3_7TeV_TrackingParticles-v1_MC_3XY_V26_20042010_091017_PAT_cfg.py ../CMSSW_3_5_6_patch1_TopTreeProd_v10/src/ConfigurationFiles/Zee/Summer09-MC_31X_V3_7TeV_TrackingParticles-v1/20042010_091017/Zee-Summer09-MC_31X_V3_7TeV_TrackingParticles-v1_MC_3XY_V26_20042010_091017_PAT_cfg.pyc
+100420_100409: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_100815: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_101536: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_102021: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_102108: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_102445: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_102619: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_103610: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_103656: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_113738: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_113751: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_113758: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_113828: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_143152: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_171731: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100420_190349: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100423_133551: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100425_154946: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100426_225343: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100426_225432: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100426_225534: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100426_225617: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100502_125527: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100503_115519: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100503_115851: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100504_085104: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100504_085221: /user/cmssoft/crab/CRAB_2_7_1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100517_133648: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100517_154037: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100517_154100: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100517_154432: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -status -c INITIATE_CREDENTIALS_CERNslc5/
+100517_155159: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -status -c INITIATE_CREDENTIALS_CERNslc5/
+100517_155820: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -status -c INITIATE_CREDENTIALS_CERNslc5/
+100517_160631: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -status -c INITIATE_CREDENTIALS_CERNslc5/
+100519_105230: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100519_105650: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100519_105727: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100519_115602: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100519_115723: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100519_131221: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100519_131345: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100519_142913: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100519_143148: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -status -c INITIATE_CREDENTIALS_CERNslc5/
+100519_143239: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -status -c INITIATE_CREDENTIALS_CERNslc5/
+100519_143721: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -status -c INITIATE_CREDENTIALS_CERNslc5/
+100519_143803: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100519_144423: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -renewCredential -c INITIATE_CREDENTIALS_CERNslc5
+100519_145434: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100519_145557: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_ucsd.cfg
+100519_145636: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -status -c INITIATE_CREDENTIALS_CERNslc5/
+100519_145823: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_ucsd.cfg
+100519_150338: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_ucsd.cfg
+100519_150405: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_ucsd.cfg
+100519_150513: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -status -c INITIATE_CREDENTIALS_CERNslc5/
+100519_150612: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -status -c INITIATE_CREDENTIALS_CERNslc5/
+100519_150639: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -status -c INITIATE_CREDENTIALS_CERNslc5/
+100519_150716: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_ucsd.cfg
+100519_150921: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -status -c INITIATE_CREDENTIALS_CERNslc5/
+100519_153823: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_ucsd.cfg
+100519_153855: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_ucsd.cfg
+100519_173939: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_ucsd.cfg
+100526_092216: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100526_092510: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100526_092706: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_ucsd.cfg
+100526_092736: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5ucsd.cfg
+100527_222357: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100527_222428: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100529_145303: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100529_145318: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5ucsd.cfg
+100606_121453: /user/cmssoft/crab/CRAB_2_7_2/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100615_085332: /jefmount_mnt/jefmount/crab/CRAB_2_7_2_p1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100615_085359: /jefmount_mnt/jefmount/crab/CRAB_2_7_2_p1/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100706_091124: /jefmount_mnt/jefmount/crab/CRAB_2_7_3/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100706_102910: /jefmount_mnt/jefmount/crab/CRAB_2_7_3/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100706_134649: /jefmount_mnt/jefmount/crab/CRAB_2_7_3/python/crab.py -create -submit -cfg crab_slc5cern.cfg
+100706_135043: /jefmount_mnt/jefmount/crab/CRAB_2_7_3/python/crab.py -create -submit -cfg crab_slc5cern.cfg
