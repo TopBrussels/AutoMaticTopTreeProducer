@@ -546,15 +546,19 @@ class CRABHandler:
 
         outFile.write("cmsRun pset.py\n")
 
-        outFile.write("echo running config "+conf2+"\n")
+        #outFile.write("echo python config "+conf2+"\n")
 
-        outFile.write("cmsRun -e -j $RUNTIME_AREA/crab_fjr_$NJob.xml "+conf2+"\n")
+        #outFile.write("python "+conf2+"\n")
+
+        outFile.write("echo running config expanded.py \n")
+
+        outFile.write("cmsRun -e -j $RUNTIME_AREA/crab_fjr_$NJob.xml expanded.py \n")
 
         outFile.close()
 
         self.doScriptExe = bool(True)
 
-        self.AdditionalCrabInput = ""+conf2
+        self.AdditionalCrabInput = "expanded.py"
         
     def createCRABcfg(self,CRABcfgFileName, dataSet, pSet, outputFile,type,publish,blackList,runSelection,forceStandAlone):
 

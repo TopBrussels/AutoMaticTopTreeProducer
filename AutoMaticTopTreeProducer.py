@@ -471,6 +471,8 @@ def processPATandTOPTREE():
 
     topCffName = top.getConfigFileName()
 
+    os.system("python "+workingDir+"/"+top.getConfigFileName())
+    os.system("mv expanded.py "+workingDir+"/")
     # create crab cfg
 
     crab = CRABHandler(timestamp,workingDir,log);
