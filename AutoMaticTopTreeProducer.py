@@ -471,9 +471,12 @@ def processPATandTOPTREE():
 
     topCffName = top.getConfigFileName()
 
-    os.system("python "+workingDir+"/"+top.getConfigFileName())
-    os.system("mv expanded.py "+workingDir+"/")
-    # create crab cfg
+    log.output(" ---> will expand the TopTree config before sending it with crab " )
+    cmd2 = 'cd '+options.cmssw_ver+'; eval `scramv1 runtime -sh`; cd -; python '+workingDir+'/'+top.getConfigFileName()+'; mv -v expanded.py '+workingDir+'/'	
+    pExe = Popen(cmd2, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True) 
+    log.output(pExe.stdout.read())
+		
+		# create crab cfg
 
     crab = CRABHandler(timestamp,workingDir,log);
 
