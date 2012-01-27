@@ -270,5 +270,6 @@ process.out.outputCommands = [
 		'keep DcsStatuss_scalersRawToDigi__*',
     'drop *_selectedPatJets_*_*',
 		'drop *_patMETs_*_*',
-		'drop *_selectedPatPhotons*_*_*'
+		'drop *_selectedPatPhotons*_*_*',
+		'keep recoCaloClusters_*_*_*'
     ]

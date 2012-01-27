@@ -592,25 +592,25 @@ class CRABHandler:
         
         if type == "PAT" and not forceStandAlone:
 
-            if self.nEventsChecked > 480*int(self.nEventsPerJob_server) or self.nEventsChecked == 0: # if task > 400 jobs go with server
+            if self.nEventsChecked > 4999*int(self.nEventsPerJob_server) or self.nEventsChecked == 0: # if task > 400 jobs go with server
 
                 self.serverName = "server"
 
         elif type == "TOPTREE" and not forceStandAlone:
 
-            if self.nEventsChecked > 480*int(self.nEventsPerJob) or self.nEventsChecked == 0: # if task > 400 jobs go with server
+            if self.nEventsChecked > 4999*int(self.nEventsPerJob) or self.nEventsChecked == 0: # if task > 400 jobs go with server
 
                 self.nEventsPerJob_server = self.nEventsPerJob
                 
                 self.serverName = "server"
 
-        elif int(self.nEvents) > 500*int(self.nEventsPerJob):
+        elif int(self.nEvents) > 4999*int(self.nEventsPerJob):
 
             self.serverName = "server"
 
         if not self.serverName == "None":
             
-            self.crabSource = "	export EDG_WL_LOCATION=/opt/edg; source /user/cmssoft/crab/latest/crab.sh" # needed for crabserver
+            #self.crabSource = "	export EDG_WL_LOCATION=/opt/edg; source /user/cmssoft/crab/latest/crab.sh" # needed for crabserver
             
             self.output(" ---> Submitting trough CrabServer")
                 

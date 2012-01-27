@@ -233,7 +233,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(100)
 
 
 # process all the events
-process.maxEvents.input = 100
+process.maxEvents.input = -1
 process.options.wantSummary = True
 process.out.dropMetaData = cms.untracked.string("DROPPED")
 

@@ -130,3 +130,7 @@ process.analysis = cms.EDAnalyzer("TopTreeProducer",
 )
 
 process.p = cms.Path(process.analysis)
+temp = process.dumpPython()
+outputfile = file("expanded.py",'w')
+outputfile.write(temp)
+outputfile.close()

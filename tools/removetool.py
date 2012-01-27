@@ -1,4 +1,4 @@
-# python script to remove obsolete productions
+ # python script to remove obsolete productions
 
 # will only work from the central account ;-)
 
@@ -23,6 +23,8 @@ from sqlHandler import SQLHandler
 
 from CrabHandler import CRABHandler
 from logHandler import logHandler
+
+import shutil
 
 # get the sensitive information from config file
 
@@ -171,8 +173,12 @@ optParser.add_option("","--remove_toptree", dest="rmTopTree",default="None",
 optParser.add_option("","--remove_pat_only", dest="rmPatonly",default="None",
                      help="Use this flag to remove the given Pattuple (associated toptrees will NOT be removed). As an argument it takes DBS dataset name", metavar="")
 
+optParser.add_option("","--clean-up", action="store_true", dest="cleanup",default=bool(False),
+                     help="This flag makes the script cross-reference all folders on PNFS with the TopDB database. Unmatched files will be removed from PNFS", metavar="")
+
 optParser.add_option("","--assume-yes", action="store_true", dest="assume_yes",default=bool(False),
                      help="Answer yes to all questions", metavar="")
+
 
 (options, args) = optParser.parse_args()
 
@@ -215,7 +221,7 @@ crab.checkGridProxy(False)
 
 #### Remove DataSet -> ALL associated PatTuples -> All associated TopTrees
 
-if not options.rmDataSet == "None":
+if not options.cleanup and not options.rmDataSet == "None":
 
     log.output("--> Removing dataset "+options.rmDataSet+" and all associated PATtuples and TopTrees")
 
@@ -269,7 +275,7 @@ if not options.rmDataSet == "None":
 
 ## remove only a toptree
 
-if not options.rmTopTree == "None":
+if not options.cleanup and not options.rmTopTree == "None":
 
     log.output("--> Removing TopTree "+options.rmTopTree)
 
@@ -291,7 +297,7 @@ if not options.rmTopTree == "None":
 
 ## remove only a pattuple
 
-if not options.rmPatonly == "None":
+if not options.cleanup and not options.rmPatonly == "None":
 
     log.output("--> Removing Pattuple "+options.rmPatonly)
 
@@ -315,7 +321,9 @@ if not options.rmPatonly == "None":
 
 ## remove a pattuple and associated toptrees
 
-if not options.rmPat == "None":
+cleanup_dirsToRemove = []
+cleanup_ldirsToRemove = []
+if not options.cleanup and not options.rmPat == "None":
 
     log.output("--> Removing Pattuple "+options.rmPat)
 
@@ -350,24 +358,398 @@ if not options.rmPat == "None":
                 #log.output("    ------> Removing TopTree with ID "+str(id[len(id)-1])+" at "+storagePath[len(storagePath)-1])
 
                         
+## general clean-up
 
+if options.cleanup:
+
+    log.output("--> Cleaning up PNFS area/TopDB/Account for dhondt")
+
+    log.output(" ---> Listing TopTrees that don't have a PNFS directory")
+
+    sql.createQuery("SELECT","toptrees","id,StoragePath","")
+
+    result2 = sql.execQuery().split('\n')
+
+    for i in result2:
+
+        if i == "" or not i.rfind("Storage") == -1: continue
+    
+        tid = i.split("\t")[0]
+
+        dir = (i.split("\t")[1]).split("\n")[0]
+
+        if not os.path.exists(dir+"/"):
+
+            #print "-> TopTree ID "+id+" ("+dir+") not on PNFS"
+            idTop.append(tid)
+            storagePathTop.append(dir)
+            mergedTopLocation.append(dir)
+
+    log.output(" ---> Listing PATuples that don't have a TopTree assigned")
+
+    sql.createQuery("SELECT","patuples","id,StoragePath,name,CffFilePath","")
+
+    result2 = sql.execQuery().split('\n')
+
+    sql.createQuery("SELECT","toptrees","patuple_id","")
+
+    result3 = sql.execQuery().split('\n')
+
+    for i in result2:
+
+        if i == "" or not i.rfind("id") == -1:  continue
+
+        tmpid = i.split("\t")[0]
+        
+        found=bool(False)
+
+        for j in result3:
+
+            if j == "": continue
+
+            if tmpid == j:
+
+                found=bool(True)
+
+        if not found:
+
+            #log.output("Patuple ID "+str(tmpid)+" has no TopTree assigned")
+
+            id.append(i.split("\t")[0])
+            storagePath.append(i.split("\t")[1])
+            dbsPublish.append(i.split("\t")[2])
+            CffFilePath.append(i.split("\t")[3])
+
+
+    days=50
+
+    log.output(" ---> Listing Configuration directories")
+    log.output("   ---> Checking every Configuration directory (older than "+str(days)+" days) for large amounts of *.stdout from CRAB")
+
+    ldirs = []
+
+    basedir=(Popen("echo $HOME", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()).strip()+"/AutoMaticTopTreeProducer/"
+    
+    for dir in os.listdir(basedir):
+
+        if dir.rfind("CMSSW_") == -1:
+            continue;
+
+        pExe = Popen("find "+basedir+dir.strip()+"/ -name crab_*.cfg", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+    
+        out = pExe.stdout.read()
+
+        #print out
+        
+        for file in out.split("\n"):
+        
+            split = file.split("/")
+   
+            dirName = ""
+            for i in xrange(0,len(split)-1):
+                dirName += split[i]+"/"
+
+            dirName = dirName.rstrip("/")
+
+            if ldirs.count(dirName) == 0 and len(dirName) > 0:
+                ldirs.append(dirName.split("/AutoMaticTopTreeProducer/")[1]) # becase we don't want it to crash on changes /home /user
+
+            # time to clean out some big chunks of stdout files
+            if not dirName == "":
+
+                filestat = os.stat(dirName)
+            
+                filedate = filestat.st_mtime
+            
+                now = int(time.time())
+                
+                last_mod=int(filedate)
+                
+                time_diff=now-last_mod
+                
+                if time_diff/(60*60*24) > days:
+
+                    #log.output("    ---> Cleaning CRAB stdout files in "+dirName+" (Age: "+str(time_diff/(3600*24))+" days)")
+
+                    crabdir=""
+
+                    for dir in os.listdir(dirName):
+
+                        if not dir.rfind("TOPTREE_") == -1 and dir.rfind(".py") == -1 and os.path.isdir(dirName+"/"+dir):
+                            
+                            crabdir=dirName+"/"+dir
+
+                    if not crabdir == "":
+
+                        numfiles=int(0)
+                        
+                        keepstdout=""
+                        keepstderr=""
+                        keepxml=""
+                        for file in os.listdir(crabdir+"/res"):
+
+                            if not file.rfind(".stdout") == -1:
+                                if os.path.getsize(crabdir+"/res/"+file) > 0 and keepstdout == "": 
+                                    keepstdout=file
+                                numfiles=numfiles+1
+
+                        #print numfiles
+
+                        if not os.path.isdir(crabdir+"/res"):
+                            numfiles=0
+                            
+                        if numfiles > 2 and dirName.rfind("Run201") == -1:
+
+                            log.output("    ---> Cleaning CRAB stdout files in "+crabdir+" (Age: "+str(time_diff/(3600*24))+" days)")
+                            time.sleep(5)
+                            #print keepstdout
+                            keepstderr=keepstdout.split(".stdout")[0]+".stderr"
+                            #print keepstderr
+                            keepxml="crab_fjr_"+(keepstdout.split(".stdout")[0]).split("CMSSW_")[1]+".xml"
+                            #print keepxml
+
+                            for file in os.listdir(crabdir+"/res"):
+                                
+                                if not os.path.isdir(crabdir+"/res/"+file) and file.rfind("Submission") == -1 and file.rfind(".json") == -1 and not file == keepxml and not file == keepstdout and not file == keepstderr:
+                                    log.output("      ---> Removing crab output "+file)
+                                    os.unlink(crabdir+"/res/"+file)
+                                elif not file.rfind("Submission") == -1:
+
+                                    log.output("      ---> Removing old Submission_X dir: "+file)
+                                    shutil.rmtree(crabdir+"/res/"+file)
+                                    #sys.exit(1)
+
+                        elif not dirName.rfind("Run201") == -1:
+
+                            if os.path.exists(crabdir+"/res/.shrunk"):
+                                continue
+
+                            log.output("    ---> (DATA PRODUCTION) Removing unuseful lines from stdout files in "+crabdir+" (Age: "+str(time_diff/(3600*24))+" days)")
+                            time.sleep(5)
+
+                            for file in os.listdir(crabdir+"/res"):
+                                
+                                if not file.rfind("Submission") == -1:
+                                
+                                    log.output("      ---> Removing old Submission_X dir: "+file)
+                                    shutil.rmtree(crabdir+"/res/"+file)
+                                    #sys.exit(1)
+
+                                elif not os.path.isdir(crabdir+"/res/"+file) and file.rfind("Submission") == -1 and file.rfind(".json") == -1 and not file.rfind(".stdout") == -1:
+
+                                    log.output("      ---> Shrinking crab output "+file)
+                                    
+                                    tmpfile = open(crabdir+"/res/"+file+"_tmp","w")
+
+                                    for line in open(crabdir+"/res/"+file):
+                                        if line.rfind("Begin processing") == -1 and line.rfind("Vertex") == -1 and line.rfind("%MSG") == -1:
+                                            tmpfile.write(line)
+
+                                    os.unlink(crabdir+"/res/"+file)
+                                    os.rename(crabdir+"/res/"+file+"_tmp",crabdir+"/res/"+file)
+
+                            f = open(crabdir+"/res/.shrunk","w") # leave a stamp that this dir is fixed
+                            f.close()
+                                    
+                            #sys.exit(1)
+       
+            #log.output("  ----> "+str(len(dirs))+" directory(s) found up to now")
+
+    log.output("  ----> "+str(len(ldirs))+" Configuration directory(s) found in total, cross-referencing TopDB...")
+
+    #print ldirs
+
+    #sys.exit(1)
+    for i in xrange(0,len(ldirs)):
+
+        #print ldirs[i]
+
+        sql.createQuery("SELECT","toptrees","id","CffFilePath REGEXP '"+ldirs[i]+"'")
+
+        result = sql.execQuery().split('\n')
+
+        sql.createQuery("SELECT","patuples","id","CffFilePath REGEXP '"+ldirs[i]+"'")
+
+        result2 = sql.execQuery().split('\n')
+
+        sql.createQuery("SELECT","gensims","id","CffPath REGEXP '"+ldirs[i]+"'")
+
+        result3 = sql.execQuery().split('\n')
+
+        sql.createQuery("SELECT","recos","id","CffPath REGEXP '"+ldirs[i]+"'")
+
+        result4 = sql.execQuery().split('\n')
+
+        #print result
+        #print result2
+
+        if len(result) < 2 and len(result2) < 2 and len(result3) < 2 and len(result4) < 2 and cleanup_ldirsToRemove.count(ldirs[i]) == 0:
+
+            filestat = os.stat(basedir+"/"+ldirs[i])
+            
+            filedate = filestat.st_mtime
+            
+            now = int(time.time())
+
+            last_mod=int(filedate)
+
+            time_diff=now-last_mod
+
+            if time_diff/(60*60) > 480: # just want the dir to be old enough to not remove ongoing prod
+            #if time_diff/(60*60) < 48: # just want the dir to be old enough to not remove ongoing prod
+
+                #log.output("  ----> Directory "+ldirs[i]+" is not in TopDB, it should be removed!")
+             
+                #log.output("   ----> Age: "+time.ctime(now)+" - "+time.ctime(last_mod)+" = "+str(time_diff/(60*60))+"h")
+            
+                #sys.exit(1)
+                
+                cleanup_ldirsToRemove.append(ldirs[i])
+
+    log.output("  ----> "+str(len(cleanup_ldirsToRemove))+" directory(s) need removal!")
+
+    #sys.exit(1)
+
+    log.output(" ---> Listing PNFS directories")
+
+    dirs = []
+
+    tmp=[]
+    #tmp.append("WJetsToLNu_Tune*")
+    #tmp.append("TTJ*")
+    tmp.append("Mu*")
+    for dir in os.listdir("/pnfs/iihe/cms/store/user/dhondt/"):
+        
+        if not dir.rfind("Skimmed-TopTrees") == -1:
+            continue;
+
+        #if dir.rfind("ForthGenertprimebW_M_500_7TeV_madgraph_Summer11_21102011_133607") == -1: continue # this is just to make testing go fast
+        
+    #for dir in tmp:
+        pExe = Popen("find /pnfs/iihe/cms/store/user/dhondt/"+dir+" -name *.root", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+    
+        out = pExe.stdout.read()
+
+        #print out
+        
+        for file in out.split("\n"):
+        
+            split = file.split("/")
+   
+            dirName = ""
+            for i in xrange(0,len(split)-1):
+                dirName += split[i]+"/"
+
+            dirName = dirName.rstrip("/")
+
+            if dirs.count(dirName) == 0 and len(dirName) > 0:
+                dirs.append(dirName)
+
+            #log.output("  ----> "+str(len(dirs))+" directory(s) found up to now")
+
+    log.output("  ----> "+str(len(dirs))+" directory(s) found in total, cross-referencing TopDB...")
+
+    #for i in xrange(0,40):
+    for i in xrange(0,len(dirs)):
+
+        #print dirs[i]
+
+        sql.createQuery("SELECT","toptrees","id","StoragePath REGEXP '"+dirs[i]+"'")
+
+        result = sql.execQuery().split('\n')
+
+        sql.createQuery("SELECT","patuples","id","StoragePath REGEXP '"+dirs[i]+"'")
+
+        result2 = sql.execQuery().split('\n')
+
+        sql.createQuery("SELECT","gensims","id","PNFSPath REGEXP '"+dirs[i]+"'")
+
+        result3 = sql.execQuery().split('\n')
+
+        sql.createQuery("SELECT","recos","id","PNFSPath REGEXP '"+dirs[i]+"'")
+
+        result4 = sql.execQuery().split('\n')
+
+        #print result
+        #print result2
+
+        #print result3
+        #print result4
+        
+        if len(result) < 2 and len(result2) < 2 and len(result3) < 2 and len(result4) < 2 and cleanup_dirsToRemove.count(dirs[i]) == 0:
+
+            filestat = os.stat(dirs[i])
+            
+            filedate = filestat.st_mtime
+            
+            now = int(time.time())
+
+            last_mod=int(filedate)
+
+            time_diff=now-last_mod
+
+            if time_diff/(60*60) > 480: # just want the dir to be old enough to not remove ongoing prod
+            #if time_diff/(60*60) > -100: # just want the dir to be old enough to not remove ongoing prod
+
+                #log.output("  ----> Directory "+dirs[i]+" is not in TopDB, it should be removed!")
+
+                #log.output("   ----> Age: "+time.ctime(now)+" - "+time.ctime(last_mod)+" = "+str(time_diff/(60*60))+"h")
+
+                cleanup_dirsToRemove.append(dirs[i])
+
+    log.output("  ----> "+str(len(cleanup_dirsToRemove))+" directory(s) need removal!")
+    
+    #sys.exit(0)
 
 ## general removal loop
 
-if len(id) == 0 and len(idTop) == 0 and options.rmDataSet == "None":
+if not options.cleanup and len(id) == 0 and len(idTop) == 0 and options.rmDataSet == "None":
+
+    sys.exit()
+
+if options.cleanup and len(cleanup_dirsToRemove) == 0 and len(cleanup_ldirsToRemove) == 0 and len(idTop) == 0 and len(id) == 0:
 
     sys.exit()
 
 log.output(" --> The following actions will be taken by the script")
-        
-for i in range(0,len(id)):
 
-    log.output("  ---> Removing PATtuple with ID "+str(id[i])+" at "+storagePath[i])
+if not options.cleanup:
+    for i in range(0,len(id)):
+        
+        log.output("  ---> Removing PATtuple with ID "+str(id[i])+" at "+storagePath[i])
+        
+        for i in range(0,len(idTop)):
+            
+            log.output("  ---> Removing TopTree with ID "+str(idTop[i])+" at "+storagePath[i])
+
+else:
     
-for i in range(0,len(idTop)):
-        
-    log.output("  ---> Removing TopTree with ID "+str(idTop[i])+" at "+storagePathTop[i])
+    time.sleep(5)
+    for dir in cleanup_ldirsToRemove:
+        filestat = os.stat(basedir+dir)
+        filedate = filestat.st_mtime
+        now = int(time.time())
+        last_mod=int(filedate)
+        time_diff=(now-last_mod)/(60*60*24)
+        log.output("  ----> Removing Configuration dir "+dir+" which is not linked to a TopTree (Age: "+str(time_diff)+" days)")
 
+    for dir in cleanup_dirsToRemove:
+        filestat = os.stat(dir)
+        filedate = filestat.st_mtime
+        now = int(time.time())
+        last_mod=int(filedate)
+        time_diff=(now-last_mod)/(60*60*24)
+        log.output("  ----> Removing "+dir+" which is not in TopDB (Age: "+str(time_diff)+" days)")
+
+    for i in range(0,len(idTop)):
+            
+        log.output("  ---> Removing TopTree with ID "+str(idTop[i])+" at "+storagePathTop[i]+" which is not on PNFS anymore")
+
+    for i in range(0,len(id)):
+            
+        log.output("  ---> Removing PATuple with ID "+str(id[i])+" which has no attached TopTrees")
+     
+        
 if not options.assume_yes:
     ans = str(raw_input('\n\nDo you want to continue? (y/n): '))
 else:
@@ -387,7 +769,7 @@ elif ans == "n":
 else:
 
     log.output(" --> Starting the removal procedure")
-
+    #print id
     for i in range(0,len(id)):
 
         rmSRMdir(storagePath[i])
@@ -404,10 +786,22 @@ else:
 
         rmTopTree(mergedTopLocation[i])
 
+    for i in cleanup_ldirsToRemove:
+
+        cmd = "cd "+basedir+"; rm -rfv "+i
+        pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+
+        print pExe.stdout.read()
+
+        log.output("  ---> Removed directory "+i)
+        
+    for i in cleanup_dirsToRemove:
+
+        rmSRMdir(i)
 
     if not options.rmDataSet == "None":
 
         rmFromTopDB("datasets",datasetID)
-    
+
     
 print ""

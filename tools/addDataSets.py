@@ -90,7 +90,7 @@ def insertDataSet(user,inputDataSet,Process,XS,CMSSWversion,DataTier,Availibilit
     values[len(values)-1].append(str(Recommended))
     values.append([])
     values[len(values)-1].append("DataTier")
-    values[len(values)-1].append(DataTier)
+    values[len(values)-1].append(str(DataTier))
     values.append([])
     values[len(values)-1].append("CMSSWversion")
     values[len(values)-1].append(CMSSWversion)
@@ -124,7 +124,7 @@ def insertDataSet(user,inputDataSet,Process,XS,CMSSWversion,DataTier,Availibilit
         sql.execQuery()
                      
 
-def insertRequest(inputDataSet,CMSSWversion,GlobalTag,prio):
+def insertRequest(inputDataSet,CMSSWversion,GlobalTag,prio,dbsInst,dataTier):
             
     values = []
     values.append([])
@@ -132,7 +132,10 @@ def insertRequest(inputDataSet,CMSSWversion,GlobalTag,prio):
     values[len(values)-1].append(inputDataSet)
     values.append([])
     values[len(values)-1].append("DataTier")
-    values[len(values)-1].append("RECO")
+    values[len(values)-1].append(dataTier)
+    values.append([])
+    values[len(values)-1].append("useLocalDBS")
+    values[len(values)-1].append(dbsInst)
     values.append([])
     values[len(values)-1].append("DontStorePat")
     values[len(values)-1].append("1")
@@ -183,23 +186,32 @@ if not options.file == "None":
 
         for line in open(options.file,"r"):
 
+            if not line.rfind("#") == -1 or line.rfind(":") == -1:
+                continue
+
             sample = (line.split("\n")[0]).split(":")            
             
-	    print sample
-	    print len(sample)
-            if len(sample) > 6:
+	    #print sample
+	    #print len(sample)
+            if len(sample) > 7:
 
                 dataset=sample[0]
-                process=sample[1]
-                xsect=sample[2]
-                CMSSW=sample[3]
-                reqCMSSW=sample[4]
-                reqTag=sample[5]+"::All"
-                reqPrio=sample[6]
+                datatier=sample[1]
+                process=sample[2]
+                xsect=sample[3]
+                CMSSW=sample[4]
+                reqCMSSW=sample[5]
+                reqTag=sample[6]+"::All"
+                reqPrio=sample[7]
+
+                reqDBSInst = ""
+                if len(sample) > 8:
+                    reqDBSInst = sample[8]
+                    
                 
-                print "Adding sample "+dataset+" (process: "+process+", XS: "+xsect+" pb, CMSSW: "+CMSSW+", requestCMSSW: "+reqCMSSW+", GlobalTag: "+reqTag+", Priority: "+reqPrio+")"
+                print "\nAdding sample "+dataset+" (dataTier: "+datatier+" process: "+process+", XS: "+xsect+" pb, CMSSW: "+CMSSW+", requestCMSSW: "+reqCMSSW+", GlobalTag: "+reqTag+", Priority: "+reqPrio+", dbsInstance: "+reqDBSInst+")\n"
                 
-                insertDataSet("Michael Maes",dataset,process,xsect,CMSSW,"RECO","Produced","0")
+                insertDataSet("TopTree Producer",dataset,process,xsect,CMSSW,datatier,"Produced","0")
                 
                 #ans = str(raw_input('\nDo you want to add a request? (y/n): '))
                 ans = "y"
@@ -215,8 +227,8 @@ if not options.file == "None":
                     print "\n\nNo actions where taken, killing this script\n\n"
     
                 else:
-
-                    insertRequest(dataset,reqCMSSW,reqTag,reqPrio)
+                    
+                    insertRequest(dataset,reqCMSSW,reqTag,reqPrio,reqDBSInst,datatier)
 
 
             else:

@@ -1,3 +1,4 @@
+
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("NewProcess")
@@ -81,7 +82,7 @@ process.analysis = cms.EDAnalyzer("TopTreeProducer",
 		doJPTJetId = cms.untracked.bool(True),
 		doMuon = cms.untracked.bool(True),
 		doElectron = cms.untracked.bool(True),
-		runSuperCluster = cms.untracked.bool(True),#true only if SuperCluster are stored
+		runSuperCluster = cms.untracked.bool(False),#true only if SuperCluster are stored
 		doCaloMET = cms.untracked.bool(True),
 		doPFMET = cms.untracked.bool(True),
 		doTCMET = cms.untracked.bool(True),

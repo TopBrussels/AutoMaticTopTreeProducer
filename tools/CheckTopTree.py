@@ -27,8 +27,8 @@ baseDir = "../CMSSW_3_6_0/src/TopBrussels/TopTreeProducer/"
 
 baseDir = sys.argv[1]
 
-#initEnv = 'cd '+baseDir+'; eval `scramv1 runtime -sh`;'
-initEnv = 'cd '+baseDir+'/../../../../CMSSW_3_6_2; eval `scramv1 runtime -sh`; cd ../tools; cd '+baseDir+';'
+initEnv = 'cd '+baseDir+'; eval `scramv1 runtime -sh`;'
+#initEnv = 'cd '+baseDir+'/../../../../CMSSW_3_6_2; eval `scramv1 runtime -sh`; cd ../tools; cd '+baseDir+';'
 
 
 if not os.path.exists(baseDir+"/tools/TopTreeContentDump.C"):
@@ -172,7 +172,7 @@ else:
 
     nEventsTotal = int(0)
 
-    cmd = "cp dumpEvents.C "+baseDir+"/tools ;"+initEnv+' export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.; cd tools/; cp ../src/libToto.so .; g++  -L `pwd` -l Toto -I `root-config --incdir` `root-config --libs` dumpEvents.C -o dumpEvents'
+    #cmd = "cp dumpEvents.C "+baseDir+"/tools ;"+initEnv+' export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.; cd tools/; cp ../src/libToto.so .; g++  -L `pwd` -l Toto -I `root-config --incdir` `root-config --libs` dumpEvents.C -o dumpEvents'
         
     pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     out = pExe.stdout.read()
@@ -186,6 +186,10 @@ else:
 
     nCurrentFile = int(0)
 
+    cmd = initEnv+"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.; cd tools/; g++  -L `pwd` -l Toto -I `root-config --incdir` `root-config --libs` TopTreeEventDump.C -o TopTreeEventDump"
+    
+    print Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
+
     for i in os.listdir(dir):
 
         if i.rfind(".root") == -1:
@@ -197,7 +201,7 @@ else:
 
         log.output("    ----> Checking file "+str(nCurrentFile)+"/"+str(nFiles)+" (Accumulated #events: "+str(nEventsTotal)+")")
         
-        cmd = initEnv+'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.; cd tools/; ./dumpEvents --inputfiles dcap://maite.iihe.ac.be'+dir+i
+        cmd = initEnv+'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.; cd tools/; ./TopTreeEventDump --inputfiles dcap://maite.iihe.ac.be'+dir+i
         
         pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
         out = pExe.stdout.read()
@@ -219,17 +223,18 @@ else:
 
         else:
 
-            tmpName = output[len(output)-2].split(' ')[0].split("/")
+            #print output
 
-            fileName = tmpName[len(tmpName)-1]
+            nEvents = output[len(output)-2]
 
-            nEvents = output[len(output)-2].split(' ')[1]
-
-            #log.output("  ---> File "+fileName+" contains "+nEvents+" events.")
+            #log.output("  ---> File contains "+nEvents+" events.")
 
             nGoodFiles += 1
 
             nEventsTotal += int(nEvents)
+
+            #sys.exit(0)
+
 
 
     log.output(" --> The script found "+str(nGoodFiles)+" good files containing in total "+str(nEventsTotal)+" events.")

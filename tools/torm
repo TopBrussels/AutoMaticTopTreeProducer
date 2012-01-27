@@ -1,3 +1,4 @@
-PaTuple 06102010_120616 Not Published in DBS
-PaTuple 29092010_124612 Not Published in DBS
-PaTuple 01102010_095507 Not Published in DBS
+python removetool.py --remove_pat="PaTuple 25032011_150909 Not Published in DBS"
+python removetool.py --remove_pat="PaTuple 25032011_143249 Not Published in DBS"  
+python removetool.py --remove_pat="PaTuple 25032011_142743 Not Published in DBS"
+python removetool.py --remove_pat="PaTuple 25032011_150909 Not Published in DBS"

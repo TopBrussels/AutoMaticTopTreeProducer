@@ -18,7 +18,7 @@ password=""
 dbaseName=""
 dbaseHost=""
 
-baseDir = "/user/dhondt/AutoMaticTopTreeProducer"
+baseDir = Popen("echo $HOME", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read().strip()+"/AutoMaticTopTreeProducer"
         
 for line in open("../.config","r"):
     if not line.rfind("DBUser") == -1:
