@@ -94,8 +94,8 @@ def mergeJSON ( json1,json2 ):
             if int(previous_lumi) != ( int(lumi) - 1 ):
                 if previous_lumi != -1:
                     final_json_string += str(previous_lumi) + "], ["
-                    final_json_string += str(lumi) + ", "
-                previous_lumi = lumi
+                final_json_string += str(lumi) + ", "
+            previous_lumi = lumi
         else:
             print "Possible problem: len(lumi) =", len(lumi)
             print "k =", k
@@ -668,7 +668,7 @@ while True:
         
         requestsPool.put(i)
         
-        time.sleep(5) # to make shure not more than 1 process uses sql
+        time.sleep(600) # to make shure not more than 1 process uses sql and to make sure that the previous request finished compiling
         
     #while not requestsPool.empty():
     
@@ -687,7 +687,7 @@ while True:
         
         requestsPoolPBS.put(i)
         
-        time.sleep(5) # to make shure not more than 1 process uses sql
+        time.sleep(600) # to make shure not more than 1 process uses sql and to make sure that the previous request finished compiling
         
     #while not requestsPool.empty():
     

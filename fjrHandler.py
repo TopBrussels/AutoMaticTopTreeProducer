@@ -12,11 +12,12 @@ class FJRHandler(ContentHandler):
 		self.isEventElement = 0
 		self.isEventsReadElement = 0
                 # record the value of interesting attributes
-		self.frameworkExitStatus = 0
+		self.frameworkExitStatus = "-9999"
                 self.frameworkError = ''
 		self.lastPFN = ''
 		self.TotalEvents = 0
 		self.EventsRead = 0
+		self.foundWrapperExit=0
 
         # this is called for each element
         def startElement(self, name, attrs):
