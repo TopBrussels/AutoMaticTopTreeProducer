@@ -1,5 +1,5 @@
 # Class to handle crab things
-
+#test of new CVS
 import time
 from time import strftime,gmtime
 from datetime import datetime
