@@ -109,6 +109,19 @@ process.eidCiCSequence = cms.Sequence(
   * process.eidTightMC * process.eidSuperTightMC * process.eidHyperTight1MC
 )
 
+
+
+
+############################### 
+########## Track Met ##########
+###############################  
+
+process.load("RecoMET.METProducers.trackMET_cff")
+from RecoMET.METProducers.trackMET_cff import *
+process.recoTrackMET = cms.Sequence(
+process.pfCandidatesForTrackMet*process.trackMet )
+
+
 ############################### 
 ########## Gen Setup ##########
 ###############################  
@@ -231,6 +244,7 @@ process.patPFJetMETtype1p2Corr.skipEM = cms.bool(False)
 process.patPFJetMETtype1p2Corr.skipMuons = cms.bool(False)
 
 
+
 # let it run
 
 process.patseq = cms.Sequence(
@@ -262,8 +276,7 @@ process.totalKinematicsFilter = cms.EDFilter('TotalKinematicsFilter',
 
 
 process.p0 = cms.Path(
-    process.totalKinematicsFilter*process.printEvents*process.patseq*
-    process.producePatPFMETCorrections
+    process.totalKinematicsFilter*process.printEvents*process.recoTrackMET*process.patseq*process.producePatPFMETCorrections
     )
 
 process.out.SelectEvents.SelectEvents = cms.vstring('p0')
@@ -289,6 +302,7 @@ process.out.outputCommands = [
     'keep patJets_*_*_*',
     'keep *_patMETs*_*_*',
     'keep *_patType1CorrectedPFMet_*_*',
+    'keep *_trackMet_*_*',
     'keep *_offlinePrimaryVertices*_*_*',
     'keep *_goodOfflinePrimaryVertices*_*_*',    
     'drop patPFParticles_*_*_*',
