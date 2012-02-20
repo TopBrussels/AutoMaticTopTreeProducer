@@ -87,6 +87,7 @@ process.analysis = cms.EDAnalyzer("TopTreeProducer",
 		runSuperCluster = cms.untracked.bool(True),#true only if SuperCluster are stored
 		doCaloMET = cms.untracked.bool(False),
 		doPFMET = cms.untracked.bool(True),
+		doTrackMET = cms.untracked.bool(True),
 		doTCMET = cms.untracked.bool(False),
 		doGenEvent = cms.untracked.bool(False),#put on False when running non-ttbar or when running toptree from reco
 		doNPGenEvent = cms.untracked.bool(False),#put on True when running New Physics sample
@@ -130,10 +131,11 @@ process.analysis = cms.EDAnalyzer("TopTreeProducer",
 		velectronProducer = cms.untracked.vstring("selectedPatElectronsPF2PAT"),# if electronTriggerMatching == true, change the electron inputTag to "cleanPatElectronsTriggerMatch"
 		CalometProducer = cms.InputTag("patMETsAK5Calo"),
 		vpfmetProducer = cms.untracked.vstring("patType1CorrectedPFMet","patMETsPF2PAT"), #previously: PFmetProducer = cms.InputTag("patMETsPF2PAT"), which is not Type 1 corrected. Note that patType1CorrectedPFMet is still using PF2PAT.
+		vtrackmetProducer = cms.untracked.vstring("trackMet"),
 		TCmetProducer = cms.InputTag("patMETsTC"),
 		genEventProducer = cms.InputTag("genEvt"),
 		generalTrackLabel = cms.InputTag("generalTracks"),
-		electronNewId = cms.untracked.bool(True) #for recent electronID recommended by EGamma. still Not accepted by Top group
+		electronNewId = cms.untracked.bool(True) 
 	)
 )
 
