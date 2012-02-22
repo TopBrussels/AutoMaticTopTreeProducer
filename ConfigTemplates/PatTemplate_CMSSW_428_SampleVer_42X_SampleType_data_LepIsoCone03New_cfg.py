@@ -244,7 +244,7 @@ process.patseq = cms.Sequence(
     )
 
 process.p0 = cms.Path(
-   process.totalKinematicsFilter*process.recoTrackMET*process.patseq*process.producePatPFMETCorrections
+   process.recoTrackMET*process.patseq*process.producePatPFMETCorrections
     )
 
 process.out.SelectEvents.SelectEvents = cms.vstring('p0')
