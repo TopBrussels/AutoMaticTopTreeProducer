@@ -78,7 +78,6 @@ process.patElectrons.electronIDSources = cms.PSet(
     eidTightMC = cms.InputTag("eidTightMC"),
     eidSuperTightMC = cms.InputTag("eidSuperTightMC"),
     eidHyperTight1MC = cms.InputTag("eidHyperTight1MC"),
-    eidHyperTight2MC = cms.InputTag("eidHyperTight2MC"),
     #VBTF 2010
     simpleEleId95relIso= cms.InputTag("simpleEleId95relIso"),
     simpleEleId90relIso= cms.InputTag("simpleEleId90relIso"),
