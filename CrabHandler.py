@@ -1156,10 +1156,7 @@ class CRABHandler:
                 outfile.close()
                 
                 for i in (handler.getResubmitList()).split(','):
-                    
-                    self.output("   -----> Checking for obsolete files for job "+str(i)+" on pnfs ("+self.outputlocation.strip()+")")
-                    
-                    
+                                       
                     try:
                         for line in open(stamp+"_out.txt","r"):
                             
