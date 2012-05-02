@@ -223,13 +223,13 @@ class CRABHandler:
         self.idleTime=int(3600)
         self.idleTimeResubmit=int(1800)
 
-        self.idleTime=int(60)
-        self.idleTimeResubmit=int(120)
+        #self.idleTime=int(60)
+        #self.idleTimeResubmit=int(120)
         
         self.maxResubmits=int(20)
 
         self.nEventsPerJob="50000"
-        self.nEvents="1"
+        self.nEvents="-1"
         
         self.nEventsPerJob_server="10000"
         self.nEvents_server="-1"
