@@ -281,6 +281,7 @@ def processPAT():
 
     crab = CRABHandler(timestamp,workingDir,log);
 
+    #print "**"+crab.baseDir
     if not dbsInst == "":
 
         crab.setDBSInst(dbsInst)
@@ -290,6 +291,8 @@ def processPAT():
     if not doDry:
         
         crab.scaleJobsSize(options.dataset,options.RunSelection,1) # if to much jobs (>2500) we create new cfg with 2500 jobs
+
+    crab.AdditionalCrabInput=getAdditionalInputFiles(crab.AdditionalCrabInput)
 
     crab.createCRABcfg("crab_pat_"+timestamp+".cfg",
                    options.dataset,
@@ -384,6 +387,8 @@ def processTOPTREE():
             
         crab.scaleJobsSize(useDataSet,options.RunSelection,10) # if to much jobs (>2500) we create new cfg with 2500 jobs
 
+    crab.AdditionalCrabInput=getAdditionalInputFiles(crab.AdditionalCrabInput)
+
     crab.createCRABcfg("crab_toptree_"+timestamp+".cfg",
                        useDataSet,
                        top.getConfigFileName(),
@@ -472,7 +477,11 @@ def processPATandTOPTREE():
     topCffName = top.getConfigFileName()
 
     log.output(" ---> will expand the TopTree config before sending it with crab " )
-    cmd2 = 'cd '+options.cmssw_ver+'; eval `scramv1 runtime -sh`; cd -; python '+workingDir+'/'+top.getConfigFileName()+'; mv -v expanded.py '+workingDir+'/'	
+    cmd2 = 'cd '+options.cmssw_ver+'; eval `scramv1 runtime -sh`; cd -; python '+workingDir+'/'+top.getConfigFileName()+'; mv -v expanded.py '+workingDir+'/'
+    if not workingDir.rfind("CMSSW_5_2_") == -1:
+        log.output("Expanding TopTree config:: CMSSW_5_2_X release detected, setting scram arch to slc5_amd64_gcc462")
+        cmd2 = "export SCRAM_ARCH=\"slc5_amd64_gcc462\";"+cmd2
+
     pExe = Popen(cmd2, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True) 
     log.output(pExe.stdout.read())
 		
@@ -494,7 +503,9 @@ def processPATandTOPTREE():
         crab.scaleJobsSize(options.dataset,options.RunSelection,1) # if to much jobs (>2500) we create new cfg with 2500 jobs
 
     crab.runTwoConfigs(patCffName,topCffName)
-
+    
+    crab.AdditionalCrabInput=getAdditionalInputFiles(crab.AdditionalCrabInput)
+                                
     crab.createCRABcfg("crab_"+timestamp+".cfg",
                        options.dataset,
                        pat.getConfigFileName(),
@@ -685,6 +696,18 @@ def dieOnError(string):
     else:
 
         log.dieOnError(string)
+
+def getAdditionalInputFiles (AdditionalCrabInput):
+
+    tmpl=str(os.path.realpath(__file__).split("AutoMaticTopTreeProducer.py")[0])+"ConfigTemplates"
+    for file in os.listdir(tmpl):
+        if not file.rfind(".xml") == -1:
+            if AdditionalCrabInput is None:
+                AdditionalCrabInput=tmpl+"/"+file
+            else:
+                AdditionalCrabInput+=","+tmpl+"/"+file
+
+    return AdditionalCrabInput
 
 ###################
 ## OPTION PARSER ##

@@ -222,10 +222,14 @@ class CRABHandler:
         
         self.idleTime=int(3600)
         self.idleTimeResubmit=int(1800)
+
+        self.idleTime=int(60)
+        self.idleTimeResubmit=int(120)
+        
         self.maxResubmits=int(20)
 
         self.nEventsPerJob="50000"
-        self.nEvents="-1"
+        self.nEvents="1"
         
         self.nEventsPerJob_server="10000"
         self.nEvents_server="-1"
@@ -268,6 +272,10 @@ class CRABHandler:
         self.crabSource="" # empty for the current crab
 
         self.initEnv = 'cd '+self.baseDir+'; eval `scramv1 runtime -sh`; source /etc/profile.d/set_globus_tcp_port_range.sh;'
+
+        if not base.rfind("CMSSW_5_2_") == -1:
+            self.log.output("CrabHandler:: CMSSW_5_2_X release detected, setting scram arch to slc5_amd64_gcc462")
+            self.initEnv = "export SCRAM_ARCH=\"slc5_amd64_gcc462\";"+self.initEnv
 
         # temp stuff
 
@@ -578,7 +586,7 @@ class CRABHandler:
         
 	self.output("--> Generating CRAB configuration for "+str(pSet))
 
-        if self.doScriptExe:
+        if self.doScriptExe or not self.AdditionalCrabInput == None:
 
             self.output(" ---> Adding "+self.AdditionalCrabInput+" to the input sandbox")
             
