@@ -177,7 +177,11 @@ class TopTreeProducer:
         #cmd = "cd CMSSW_3_6_2; eval `scramv1 runtime -sh`; cd ../; cd "+self.workingDir+"/../../../../TopBrussels/TopTreeProducer/tools; ls; export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:."+compileDumper+runDumper
             
         #else:
-            
+
+	if not self.workingDir.rfind("CMSSW_5_2_") == -1:
+            self.log.output("TopTreeProducer::CMSSW_5_2_X release detected, setting scram arch to slc5_amd64_gcc462")
+            self.initEnv = "export SCRAM_ARCH=\"slc5_amd64_gcc462\";"+self.initEnv        
+    
         cmd = self.initEnv+" ls ; cd ../../../../TopBrussels/TopTreeProducer/src; make; cd ../tools; export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:."+compileDumper+runDumper
 
         #print cmd
@@ -195,6 +199,6 @@ class TopTreeProducer:
 
 #from logHandler import logHandler
 
-#top = TopTreeProducer("123","CMSSW_4_2_8_patch5_TopTreeProd_42X_v2--10GeVJetPreselNewJPBtagCalib/src/ConfigurationFiles/Tbar_TuneZ2_t-channel_7TeV-powheg-tauola/Summer11-PU_S4_START42_V11-v1/21122011_140415",logHandler(""))
+#top = TopTreeProducer("123","CMSSW_5_2_4_patch1_TopTreeProd_52X_v1/src/ConfigurationFiles/TTJets_TuneZ2star_8TeV-madgraph-tauola/Summer12-PU_S7_START52_V5-v1/02052012_153657/",logHandler(""))
 
-#print top.dumpEventContent("/pnfs/iihe/cms/store/user/dhondt/Tbar_TuneZ2_t-channel_7TeV-powheg-tauola/Summer11-PU_S4_START42_V11-v1/21122011_140415/TOPTREE/")
+#print top.dumpEventContent("/pnfs/iihe/cms/store/user/mmaes/TTJets_TuneZ2star_8TeV-madgraph-tauola/Summer12-PU_S7_START50_V15-v1/02052012_134053/TOPTREE/")
