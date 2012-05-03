@@ -219,18 +219,18 @@ class Request:
         xmlFile.close()
 
         # store the CRAB report JSON XML
-
+            
         if len(self.JSON.split(";")) == 2:
-
-            #JSONFile = "/localgrid/mmaes/MERGED_JSON"+stamp+".json"
+            
             JSONFile = "/localgrid/dhondt/MERGED_JSON"+stamp+".json"
-        
+            
             cJSONFile = open(JSONFile,"w")
             
             cJSONFile.write(mergeJSON(JSONDest,self.JSON.split(";")[1]))
-
+            
             cJSONFile.close()
-
+            
+            
         # if we use a JSON we need to change useJSON and JSONFile in the skim XML
         if not self.JSON == "":
 
@@ -354,11 +354,13 @@ class RequestHandler:
         
         self.sql.createQuery("SELECT","skimrequests","*","(Status = 'Pending' OR Status = 'Queued') AND host = '"+host+"'")
 
-        f = open("sql.out","w")
+        sqlFile = "sql_"+strftime("%d%m%Y_%H%M%S")+".out"
+
+        f = open(sqlFile,"w")
         f.write(self.sql.execQuery())
         f.close()
     
-        for res in open("sql.out","r"):
+        for res in open(sqlFile,"r"):
 
             #print res
             line = res.split("\n")[0]
@@ -416,7 +418,7 @@ class RequestHandler:
                 self.requests.append(request)
 
                 #sys.exit(1);
-        os.remove("sql.out")
+        os.remove(sqlFile)
 
 ################################
 ## WORKER CLASS FOR THREADING ##

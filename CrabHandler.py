@@ -231,7 +231,7 @@ class CRABHandler:
         self.nEventsPerJob="50000"
         self.nEvents="-1"
         
-        self.nEventsPerJob_server="10000"
+        self.nEventsPerJob_server="50000"
         self.nEvents_server="-1"
 
         self.nMaxJobsPerSubmit=int(300)
@@ -844,33 +844,25 @@ class CRABHandler:
 
         # now we might want to rescale our jobs
 
-        if int(nEventsDBS)/int(self.nEventsPerJob) <= 600 and int(nEventsDBS)/int(self.nEventsPerJob) > 450:
+        if nEventsDBS < 1500000: # events <1.5M
 
-            #print str(int(nEventsDBS)/int(self.nEventsPerJob))
+            self.nEventsPerJob_server = str(5000*scalefactor)
 
-            #print nEventsDBS
-            #print self.nEventsPerJob
-            self.nEventsPerJob_server = str(int(math.ceil(nEventsDBS/(450/scalefactor)))) # scale to ~450 jobs
+            self.nEventsPerJob = str(5000*scalefactor)
 
-            self.nEventsPerJob = str(int(math.ceil(nEventsDBS/(450/scalefactor)))) # scale to ~450 jobs
+            self.output(" ---> Changing #events/job to "+self.nEventsPerJob_server)
 
-            self.output(" ---> Original <= 600 jobs so Changing #events/job to "+self.nEventsPerJob_server+" so we can use StandAlone CRAB (~450 jobs)")
+        elif nEventsDBS < 5000000: # events <5M
 
-            #sys.exit(1);
+            self.nEventsPerJob_server = str(10000*scalefactor)
 
-            return bool(False)
-                    
-        elif nEventsDBS > 5000000 and nEventsDBS < 10000000: # 5M < #events < 10M
-
-            self.nEventsPerJob_server = str(int(math.ceil(nEventsDBS/(450/scalefactor)))) # scale to ~450 jobs
-
-            self.nEventsPerJob = str(int(math.ceil(nEventsDBS/(450/scalefactor)))) # scale to ~450 jobs
+            self.nEventsPerJob = str(10000*scalefactor)
 
             self.output(" ---> Changing #events/job to "+self.nEventsPerJob_server)
 
             return bool(True)
 
-        elif nEventsDBS > 10000000: # events > 10M
+        elif nEventsDBS < 10000000: # events <10M
 
             self.nEventsPerJob_server = str(20000*scalefactor)
 
@@ -880,9 +872,9 @@ class CRABHandler:
 
             return bool(True)
 
-        else: # no need to rescale if # events < 5M
+        else: # no need to rescale if # events >10M
 
-            self.output(" ---> Ok, leaving the # of events per job")
+            self.output(" ---> Ok, leaving the # of events per job unchanged")
             
             return bool(False)
 

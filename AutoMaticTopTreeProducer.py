@@ -495,7 +495,7 @@ def processPATandTOPTREE():
 
         log.output(" ---> CRAB will use DBS instance "+dbsInst+" to look for your data.")
 
-    crab.nEventsPerJob = "20000"
+    #crab.nEventsPerJob = "20000"
     #crab.nEventsPerJob = "500"
 
     if not doDry:
