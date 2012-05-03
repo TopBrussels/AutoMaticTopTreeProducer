@@ -35,7 +35,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 process.source = cms.Source("PoolSource",
-	fileNames = cms.untracked.vstring('file:TTJets_Madgraph_Summer11_Final1_PAT.root')
+	fileNames = cms.untracked.vstring('file:MC_Summer12_PAT.root')
 )
 
 # reduce verbosity
