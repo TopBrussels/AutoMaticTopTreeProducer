@@ -626,6 +626,11 @@ def updateTopDB(type): # type = pat or toptree
     topTAG=""
 
     cmd ='cd '+workingDir+'; eval `scramv1 runtime -sh`; showtags >> tags'
+
+    if not workingDir.rfind("CMSSW_5_2_") == -1:
+        log.output("updateTopDB:: CMSSW_5_2_X release detected, setting scram arch to slc5_amd64_gcc462")
+        cmd = "export SCRAM_ARCH=\"slc5_amd64_gcc462\";"+cmd
+    
     pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     out = pExe.stdout.read()
 
