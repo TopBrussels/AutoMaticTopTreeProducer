@@ -120,9 +120,9 @@ process.pfIsolatedMuonsPF2PAT.combinedIsolationCut = cms.double(0.2)
 process.pfIsolatedMuonsPF2PAT.isolationCut = cms.double(0.2)
 process.pfIsolatedMuonsPF2PAT.doDeltaBetaCorrection = True
 process.pfSelectedMuonsPF2PAT.cut = cms.string('pt > 10. && abs(eta) < 2.5')
-process.pfIsolatedMuonsPF2PAT.isolationValueMapsCharged = cms.VInputTag(cms.InputTag("muPFIsoValueCharged03PF2PAT"))
-process.pfIsolatedMuonsPF2PAT.deltaBetaIsolationValueMap = cms.InputTag("muPFIsoValuePU03PF2PAT")
-process.pfIsolatedMuonsPF2PAT.isolationValueMapsNeutral = cms.VInputTag(cms.InputTag("muPFIsoValueNeutral03PF2PAT"), cms.InputTag("muPFIsoValueGamma03PF2PAT"))
+process.pfIsolatedMuonsPF2PAT.isolationValueMapsCharged = cms.VInputTag(cms.InputTag("muPFIsoValueCharged04PF2PAT"))
+process.pfIsolatedMuonsPF2PAT.deltaBetaIsolationValueMap = cms.InputTag("muPFIsoValuePU04PF2PAT")
+process.pfIsolatedMuonsPF2PAT.isolationValueMapsNeutral = cms.VInputTag(cms.InputTag("muPFIsoValueNeutral04PF2PAT"), cms.InputTag("muPFIsoValueGamma04PF2PAT"))
 
 print "process.pfIsolatedMuonsPF2PAT.isolationCut -> "+str(process.pfIsolatedMuonsPF2PAT.isolationCut)
 print "process.pfIsolatedMuonsPF2PAT.combinedIsolationCut -> "+str(process.pfIsolatedMuonsPF2PAT.combinedIsolationCut)
