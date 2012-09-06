@@ -273,8 +273,8 @@ class CRABHandler:
 
         self.initEnv = 'cd '+self.baseDir+'; eval `scramv1 runtime -sh`; source /etc/profile.d/set_globus_tcp_port_range.sh;'
 
-        if not base.rfind("CMSSW_5_2_") == -1:
-            self.log.output("CrabHandler:: CMSSW_5_2_X release detected, setting scram arch to slc5_amd64_gcc462")
+        if not base.rfind("CMSSW_5_") == -1:
+            self.log.output("CrabHandler:: CMSSW_5_X_Y release detected, setting scram arch to slc5_amd64_gcc462")
             self.initEnv = "export SCRAM_ARCH=\"slc5_amd64_gcc462\";"+self.initEnv
 
         # temp stuff
@@ -366,6 +366,7 @@ class CRABHandler:
 	serverDNlist.append("/C=IT/O=INFN/OU=Host/L=Bari/CN=crab1.ba.infn.it")
         serverDNlist.append("/DC=ch/DC=cern/OU=computers/CN=vocms58.cern.ch")
 	serverDNlist.append("/C=DE/O=GermanGrid/OU=DESY/CN=host/t2-cms-cs0.desy.de")
+	serverDNlist.append("/DC=ch/DC=cern/OU=computers/CN=vocms83.cern.ch")
 
         for serverDN in serverDNlist:
 
@@ -862,7 +863,7 @@ class CRABHandler:
 
             return bool(True)
 
-        elif nEventsDBS < 10000000: # events <10M
+        elif nEventsDBS < 40000000: # events <40M
 
             self.nEventsPerJob_server = str(20000*scalefactor)
 

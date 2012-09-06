@@ -478,8 +478,8 @@ def processPATandTOPTREE():
 
     log.output(" ---> will expand the TopTree config before sending it with crab " )
     cmd2 = 'cd '+options.cmssw_ver+'; eval `scramv1 runtime -sh`; cd -; python '+workingDir+'/'+top.getConfigFileName()+'; mv -v expanded.py '+workingDir+'/'
-    if not workingDir.rfind("CMSSW_5_2_") == -1:
-        log.output("Expanding TopTree config:: CMSSW_5_2_X release detected, setting scram arch to slc5_amd64_gcc462")
+    if not workingDir.rfind("CMSSW_5_") == -1:
+        log.output("Expanding TopTree config:: CMSSW_5_X_Y release detected, setting scram arch to slc5_amd64_gcc462")
         cmd2 = "export SCRAM_ARCH=\"slc5_amd64_gcc462\";"+cmd2
 
     pExe = Popen(cmd2, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True) 
@@ -627,8 +627,8 @@ def updateTopDB(type): # type = pat or toptree
 
     cmd ='cd '+workingDir+'; eval `scramv1 runtime -sh`; showtags >> tags'
 
-    if not workingDir.rfind("CMSSW_5_2_") == -1:
-        log.output("updateTopDB:: CMSSW_5_2_X release detected, setting scram arch to slc5_amd64_gcc462")
+    if not workingDir.rfind("CMSSW_5_") == -1:
+        log.output("updateTopDB:: CMSSW_5_X_Y release detected, setting scram arch to slc5_amd64_gcc462")
         cmd = "export SCRAM_ARCH=\"slc5_amd64_gcc462\";"+cmd
     
     pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)

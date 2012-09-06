@@ -105,13 +105,14 @@ class DBSHandler:
 
 #print dbs.getTotalEvents("/MinimumBias/Commissioning10-SD_Mu-v9/RECO",[133874,134800])
 
-#print dbs.datasetExists("/MinimumBias/Commissioning10-SD_Mu-v9/RECO")
+#print dbs.datasetExists("/MuHad/Run2012A-13Jul2012-v1/AOD")
+#print dbs.getTotalEvents("/MuHad/Run2012A-13Jul2012-v1/AOD",[])
 
 #dbs2 = DBSHandler("cms_dbs_ph_analysis_02")
 
 #ds = '/SingleTop_sChannel-madgraph/dhondt-PAT_SingleTop_sChannel-madgraph_Spring10-START3X_V26_S09-v1_11062010_093308-09ac191e07064fca2fda7ee6494480b8/USER'
 
-#print dbs2.datasetExists(ds)
+#print dbs2.datasetExists(ds) /MuHad/Run2012A-13Jul2012-v1/AOD 
 
 #print dbs2.getTotalEvents(ds,[])
 
