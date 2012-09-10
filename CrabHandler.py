@@ -220,7 +220,7 @@ class CRABHandler:
 
         self.myProxyServer = "myproxy.cern.ch"
         
-        self.idleTime=int(30)
+        self.idleTime=int(3600)
         self.idleTimeResubmit=int(1800)
 
         #self.idleTime=int(60)
@@ -826,9 +826,6 @@ class CRABHandler:
             outFile.write('dbs_url = https://cmsdbsprod.cern.ch:8443/'+self.dbsInst+'_writer/servlet/DBSServlet\n')
             
 	outFile.write('pset = '+pSet+'\n')
-
-        self.nEventsPerJob="1"
-        self.nEvents="10"
 
         if not isData:
             outFile.write('events_per_job = '+self.nEventsPerJob+'\n')
