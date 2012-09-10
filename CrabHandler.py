@@ -220,7 +220,7 @@ class CRABHandler:
 
         self.myProxyServer = "myproxy.cern.ch"
         
-        self.idleTime=int(3600)
+        self.idleTime=int(30)
         self.idleTimeResubmit=int(1800)
 
         #self.idleTime=int(60)
@@ -241,6 +241,10 @@ class CRABHandler:
         self.forceWhiteList = bool(False)
 
         #** Do NOT touch
+
+        pwd = Popen("echo $HOME", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read().strip()
+        self.proxyDir = pwd+"/.globus/.altcert/"
+        self.useAltProxy = ""
 
 	self.serverName = ""
         self.nEventsChecked = int(0)
@@ -327,6 +331,41 @@ class CRABHandler:
                 
         pExe.communicate(password)
 
+        # create alternative proxy's for job submission
+        #print self.proxyDir
+        if os.path.exists(self.proxyDir):
+            for file in os.listdir(self.proxyDir):
+                if file.rfind("usercert") == -1:
+                    continue
+
+                #first we need to check if cert is still valid
+
+                check = "openssl x509 -in "+self.proxyDir+"/"+file+" -noout -enddate | awk -F \"notAfter=\" {print'$2'}"
+                res = Popen(check, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
+
+                res=res.split(" GMT")[0]
+                
+                t1 = time.mktime(time.strptime(res.strip(), "%b %d %H:%M:%S %Y")) # exp date cert
+                t2 = time.mktime(gmtime()) # current time
+
+                validfor = (t1-t2)/(60*60*24) # time diff in days
+
+                if validfor < 30:
+                    self.output("CranHandler::createGridProxy - Certificate "+file+" expires in "+str(validfor)+" days, please install a new one. Skipped!")
+                    continue
+
+                #create the proxy
+                
+                user=(file.split("_")[1]).split(".")[0]
+
+                cmd = "voms-proxy-init --voms cms:/cms/becms --valid 190:00 -cert "+self.proxyDir+"/usercert_"+user+".pem -key ~/.globus/.altcert/userkey_"+user+".pem -out "+self.proxyDir+"/proxy/proxy_"+user+" -pwstdin"
+
+                #print cmd
+
+                pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                
+                pExe.communicate(password)
+                
     def genCredName(self,serverDN):
 
         import commands
@@ -353,6 +392,15 @@ class CRABHandler:
         cmd ='source /etc/profile.d/set_globus_tcp_port_range.sh; myproxy-init --certfile=$X509_USER_PROXY --keyfile=$X509_USER_PROXY -d -n -s '+self.myProxyServer+' -x -t 168:00'
         pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
 
+        if os.path.exists(self.proxyDir+"/proxy"):
+            for proxy in os.listdir(self.proxyDir+"/proxy"):
+                
+                #print proxy
+                cmd ='source /etc/profile.d/set_globus_tcp_port_range.sh; myproxy-init --certfile='+self.proxyDir+'/proxy/'+proxy+' --keyfile='+self.proxyDir+'/proxy/'+proxy+' -d -n -s '+self.myProxyServer+' -x -t 168:00'
+                pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+
+            
+
         #print cmd
 
         # now we generate a credential for UCSD and CERN crabservers
@@ -373,7 +421,13 @@ class CRABHandler:
             cmd = 'myproxy-init --certfile=$X509_USER_PROXY --keyfile=$X509_USER_PROXY -d -n -s '+self.myProxyServer+' -x -R \''+serverDN+'\' -Z \''+serverDN+'\' -k '+self.genCredName(serverDN)+' -t 168:00'
             pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
 
-            #print cmd
+            if os.path.exists(self.proxyDir+"/proxy"):
+                for proxy in os.listdir(self.proxyDir+"/proxy"):
+                    #print proxy
+                    cmd = 'myproxy-init --certfile='+self.proxyDir+'/proxy/'+proxy+' --keyfile='+self.proxyDir+'/proxy/'+proxy+' -d -n -s '+self.myProxyServer+' -x -R \''+serverDN+'\' -Z \''+serverDN+'\' -k '+self.genCredName(serverDN)+' -t 168:00'
+                    pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+
+                    #print cmd
             #print pExe.stdout.read()
 
     def checkGridProxy (self,silent):
@@ -432,12 +486,12 @@ class CRABHandler:
         lines = output.split('\n')
         
         #print lines
-        
+        self.createMyProxyCredentials()
+
         if not lines[1].rfind("no credentials found for user") == -1:
 
             self.output(" ---> No Credentials are found on MyProxy Server "+self.myProxyServer+" , creating new credentials")
 
-            self.createMyProxyCredentials()
 
         else:
 
@@ -471,7 +525,91 @@ class CRABHandler:
                             else:
                                 self.output(" ---> Ok, valid Credential was found (Valid for "+str(timeleft[1])+")")
 
-                            
+    def pickProxy(self):
+
+        import random
+
+        availProxy = []
+        availProxy.append("")
+
+        if os.path.exists(self.proxyDir+"/proxy"):
+            for proxy in os.listdir(self.proxyDir+"/proxy"):
+                availProxy.append(self.proxyDir+"/proxy/"+proxy)
+
+        #print availProxy
+        #print self.proxyDir
+
+        #sys.exit(1)
+        self.useAltProxy = availProxy[int(random.uniform(0,len(availProxy)))]
+
+        if not self.useAltProxy == "":
+            self.output("  ---> CrabHandler::pickProxy - using an alternative GRID proxy to submit the jobs")
+            
+        #self.useAltProxy=availProxy[1]
+        
+        #print self.useAltProxy
+
+        # testing if it's uniform
+        #availProxy.append("a")
+        #availProxy.append("b")
+        #availProxy.append("c")
+        #availProxy.append("d")
+        #availProxy.append("e")
+
+        #print availProxy
+
+        #test=[0,0,0,0,0,0,0]
+
+        #for i in xrange(100):
+            #print len(availProxy)
+            #res = int(random.uniform(0,len(availProxy)))
+            #print res
+            #test[res]=test[res]+1
+            #print ""
+            
+        #print test
+
+    def repackProxy(self):
+
+        #time.sleep(10)
+
+        if self.useAltProxy == "":
+            return ""
+
+        #print "Proxy: "+self.useAltProxy
+
+        t1 = os.path.getmtime(self.useAltProxy) # time last modified
+        t2 = time.mktime(gmtime())+(60*60) # current time
+
+        #print t1
+        #print t2
+
+        #print time.ctime(t1)
+        #print time.ctime(t2)
+        
+        tdiff = t2-t1
+        
+        if tdiff > 300 and tdiff < (2*3600):
+
+            self.output(" ---> CrabHandler::repackProxy - Repacking stageout grid proxy in CRAB SandBox")
+
+            cmd = self.initEnv
+            cmd = cmd+" cd "+self.UIWorkingDir+"/share;"
+            cmd = cmd+" mkdir tmp;"
+            cmd = cmd+" mv -v default.tgz tmp/;"
+            cmd = cmd+" cd tmp;"
+            cmd = cmd+" tar -xzvf default.tgz; rm default.tgz; "
+            cmd = cmd+" cp -v $X509_USER_PROXY tmpfile;"
+            cmd = cmd+" tar -czvf default.tgz *;"
+            cmd = cmd+" mv default.tgz ..;"
+            cmd = cmd+" cd ../;"
+            cmd = cmd+" rm -rfv tmp"
+                        
+            p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+            p.stdout.read() 
+            
+        
+        
     def checkCEstatus(self,CEname):
 
         self.output("--> Checking if CE "+CEname+" is ready to process our jobs")
@@ -571,6 +709,9 @@ class CRABHandler:
         
     def createCRABcfg(self,CRABcfgFileName, dataSet, pSet, outputFile,type,publish,blackList,runSelection,forceStandAlone):
 
+        # check which proxy to use for submission
+        self.pickProxy()
+
         #check if it's MC or data
 
         isData = False
@@ -591,10 +732,16 @@ class CRABHandler:
 
             self.output(" ---> Adding "+self.AdditionalCrabInput+" to the input sandbox")
             
-        #self.crabSource = "export EDG_WL_LOCATION=/opt/edg; source /user/cmssoft/crab/latest/crab.sh"
-        self.crabSource = "export EDG_WL_LOCATION=/opt/edg; source /jefmount_mnt/jefmount/cmss/CRAB/latest/crab.sh"
+        #self.crabSource = "export EDG_WL_LOCATION=/opt/edg; source /jefmount_mnt/jefmount/cmss/CRAB/latest/crab.sh"
+        self.crabSource = "export EDG_WL_LOCATION=/opt/edg; source /jefmount_mnt/jefmount/cmss/CRAB/topdb-latest/crab.sh"
+        if self.doScriptExe and not self.useAltProxy == "":
+            self.crabSource = "export X509_USER_PROXY="+self.useAltProxy+"; "+self.crabSource
         
         self.serverName = "None"
+
+        #cmd = self.crabSource+"; voms-proxy-info"
+        #pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+        #print pExe.stdout.read()
         
         #self.serverName = self.checkCrabServers()
         # only possible at this moment for slc4 servers
@@ -680,6 +827,9 @@ class CRABHandler:
             
 	outFile.write('pset = '+pSet+'\n')
 
+        self.nEventsPerJob="1"
+        self.nEvents="10"
+
         if not isData:
             outFile.write('events_per_job = '+self.nEventsPerJob+'\n')
             outFile.write('total_number_of_events = '+self.nEvents+'\n')
@@ -702,15 +852,38 @@ class CRABHandler:
 	outFile.write('ui_working_dir = ' + self.UIWorkingDir + '\n')
 	outFile.write('return_data = 0\n')
 	outFile.write('copy_data = 1\n')
-        outFile.write('storage_element = T2_BE_IIHE\n')
 
         if not publish:
-            
-            outFile.write('user_remote_dir = /'+dataSetSplit[1]+'/'+dataSetSplit[2]+'/'+self.timeStamp+"/"+type+'\n')
-
             self.outputlocation = '/pnfs/iihe/cms/store/user/'+self.getUserName()+'/'+dataSetSplit[1]+'/'+dataSetSplit[2]+'/'+self.timeStamp+"/"+type+'\n'
 
+            if self.doScriptExe and not self.useAltProxy == "":
+                outFile.write('storage_element = maite.iihe.ac.be\n')
+                outFile.write('storage_path = /srm/managerv2?SFN=/pnfs/iihe/cms/store/user/'+self.getUserName()+'\n')
+
+                if self.AdditionalCrabInput == None:
+                    self.AdditionalCrabInput="tmpfile"
+                else:
+                    self.AdditionalCrabInput=self.AdditionalCrabInput+",tmpfile"
+
+                cmd = "cp -v $X509_USER_PROXY "+self.baseDir+"/tmpfile"
+                pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                #print pExe.stdout.read()
+
+                tmpFile = open(self.baseDir+"/setGridProxyForManualCrab", 'w')
+                tmpFile.write("export X509_USER_PROXY=\""+self.useAltProxy+"\"\n");
+
+                #cmd = "voms-proxy-info;"+self.crabSource+"; voms-proxy-info; voms-proxy-info -file "+self.baseDir+"/tmpfile"
+                #pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                #print pExe.stdout.read()
+                
+            else:
+                outFile.write('storage_element = T2_BE_IIHE\n')
+
+            outFile.write('user_remote_dir = /'+dataSetSplit[1]+'/'+dataSetSplit[2]+'/'+self.timeStamp+"/"+type+'\n')
+            
+
         if publish:
+            outFile.write('storage_element = T2_BE_IIHE\n')
             outFile.write('publish_data = 1\n')
             outFile.write('publish_data_name = '+self.publishName+'\n')
             outFile.write('dbs_url_for_publication = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_02_writer/servlet/DBSServlet\n')
@@ -1016,6 +1189,9 @@ class CRABHandler:
         self.output("--> Checking jobs in "+self.UIWorkingDir+" every "+str(self.idleTime)+"s")
 
         done=bool(False)
+
+        if os.path.exists(self.baseDir+"/tmpfile"):
+            os.remove(self.baseDir+"/tmpfile")
           
         while not done:
 
@@ -1043,6 +1219,8 @@ class CRABHandler:
 
             self.checkGridProxy(True) # make it silent to not have massive logfiles
             self.checkCredentials(True)
+
+            self.repackProxy()
             
             cmd = self.initEnv+self.crabSource+';crab -status -c '+self.UIWorkingDir+' -USER.xml_report=output.xml >& crab.status'
             p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
@@ -1501,10 +1679,19 @@ class CRABHandler:
 
         return round(jobEff*100,2)
 
-from logHandler import logHandler
+#from logHandler import logHandler
 
+#crab = CRABHandler("",".",logHandler(""))
 
-#crab = CRABHandler("","",logHandler(""))
+#crab.createGridProxy()
+
+#crab.runTwoConfigs("lol","lala")
+
+#crab.createCRABcfg("lol.cfg", "/A/B/GEN-SIM-RECO", "somefile", "someotherfile","GEN-SIM-RECO",False,"","",False)
+
+#crab.UIWorkingDir="TOPTREE_Summer12_DR53X-PU_S10_START53_V7A-v1_30082012_084255"
+#crab.repackProxy()
+#crab.createMyProxyCredentials()
 
 #crab.createMyProxyCredentials()
 
