@@ -486,12 +486,12 @@ class CRABHandler:
         lines = output.split('\n')
         
         #print lines
-        self.createMyProxyCredentials()
-
+        
         if not lines[1].rfind("no credentials found for user") == -1:
 
             self.output(" ---> No Credentials are found on MyProxy Server "+self.myProxyServer+" , creating new credentials")
 
+            self.createMyProxyCredentials()
 
         else:
 
