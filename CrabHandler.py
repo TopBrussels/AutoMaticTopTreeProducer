@@ -543,7 +543,9 @@ class CRABHandler:
         self.useAltProxy = availProxy[int(random.uniform(0,len(availProxy)))]
 
         if not self.useAltProxy == "":
-            self.output("  ---> CrabHandler::pickProxy - using an alternative GRID proxy to submit the jobs")
+            cert = self.useAltProxy.split("/")
+            cert = cert[len(cert)-1]
+            self.output("  ---> CrabHandler::pickProxy - using alternative GRID proxy <"+str(cert)+"> to submit the jobs")
             
         #self.useAltProxy=availProxy[1]
         
