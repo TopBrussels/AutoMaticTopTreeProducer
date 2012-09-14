@@ -158,7 +158,7 @@ class CrabStatusParser(ContentHandler):
             wrapExitCode = job.split(":")[4]
             statusReason = job.split(":")[5]
                         
-            if not state == "Created" and not state == "Submitting":
+            if not state == "Created":
 
                 if int(nResubmits) < self.maxResubmit and (int(appExitCode) > 0 or int(wrapExitCode) > 0):
                     resubmit += jobId+','
@@ -170,6 +170,15 @@ class CrabStatusParser(ContentHandler):
                     resubmit += jobId+','
                     
                 elif int(nResubmits) < self.maxResubmit and (state == "Submitted" and migrate):
+                    resubmit += jobId+','
+
+                elif int(nResubmits) < self.maxResubmit and (state == "Submitting" and migrate):
+                    resubmit += jobId+','
+
+                elif int(nResubmits) < self.maxResubmit and (state == "Ready" and migrate):
+                    resubmit += jobId+','
+
+                elif int(nResubmits) < self.maxResubmit and (state == "Waiting" and migrate):
                     resubmit += jobId+','
 
                 #if int(nResubmits) < self.maxResubmit and not statusReason.rfind("job exit code !=0") == -1:
