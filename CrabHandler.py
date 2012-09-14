@@ -137,7 +137,11 @@ class CrabStatusParser(ContentHandler):
 
         return self.output
 
-    def getResubmitList(self):
+    def getNStuck(self):
+
+        return self.nSubmitted+self.nSubmitting+self.nReady+self.nWaiting
+
+    def getResubmitList(self,migrate):
 
         resubmit = ""
 
@@ -153,13 +157,19 @@ class CrabStatusParser(ContentHandler):
             appExitCode = job.split(":")[3]
             wrapExitCode = job.split(":")[4]
             statusReason = job.split(":")[5]
-
-            if not state == "Created" and not state == "Submitting" and not state == "Submitted":
+                        
+            if not state == "Created" and not state == "Submitting":
 
                 if int(nResubmits) < self.maxResubmit and (int(appExitCode) > 0 or int(wrapExitCode) > 0):
                     resubmit += jobId+','
 
-                if int(nResubmits) < self.maxResubmit and (not state.rfind("Cancelled") == -1 or not state.rfind("Aborted") == -1 or not state.rfind("CannotSubmit") == -1):
+                elif int(nResubmits) < self.maxResubmit and (not state.rfind("Cancelled") == -1 or not state.rfind("Aborted") == -1 or not state.rfind("CannotSubmit") == -1):
+                    resubmit += jobId+','
+
+                elif int(nResubmits) < self.maxResubmit and (not statusReason.rfind("Terminated") == -1):
+                    resubmit += jobId+','
+                    
+                elif int(nResubmits) < self.maxResubmit and (state == "Submitted" and migrate):
                     resubmit += jobId+','
 
                 #if int(nResubmits) < self.maxResubmit and not statusReason.rfind("job exit code !=0") == -1:
@@ -530,7 +540,7 @@ class CRABHandler:
         import random
 
         availProxy = []
-        availProxy.append("")
+        #availProxy.append("")
 
         if os.path.exists(self.proxyDir+"/proxy"):
             for proxy in os.listdir(self.proxyDir+"/proxy"):
@@ -579,8 +589,8 @@ class CRABHandler:
             return ""
 
         #print "Proxy: "+self.useAltProxy
-
-        t1 = os.path.getmtime(self.useAltProxy) # time last modified
+        prox = Popen("echo $X509_USER_PROXY", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
+        t1 = os.path.getmtime(prox.strip()) # time last modified
         t2 = time.mktime(gmtime())+(60*60) # current time
 
         #print t1
@@ -591,26 +601,47 @@ class CRABHandler:
         
         tdiff = t2-t1
         
-        if tdiff > 300 and tdiff < (2*3600):
+        #if tdiff > 300 and tdiff < (2*3600):
+        if tdiff < 5400:
 
-            self.output(" ---> CrabHandler::repackProxy - Repacking stageout grid proxy in CRAB SandBox")
-
-            cmd = self.initEnv
-            cmd = cmd+" cd "+self.UIWorkingDir+"/share;"
-            cmd = cmd+" mkdir tmp;"
-            cmd = cmd+" mv -v default.tgz tmp/;"
-            cmd = cmd+" cd tmp;"
-            cmd = cmd+" tar -xzvf default.tgz; rm default.tgz; "
-            cmd = cmd+" cp -v $X509_USER_PROXY tmpfile;"
-            cmd = cmd+" tar -czvf default.tgz *;"
-            cmd = cmd+" mv default.tgz ..;"
-            cmd = cmd+" cd ../;"
-            cmd = cmd+" rm -rfv tmp"
-                        
-            p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-            p.stdout.read() 
+            tdiff2=0
             
-        
+            if os.path.exists(self.baseDir+"/"+self.UIWorkingDir+"/share/.repacked"):
+                t3 = os.path.getmtime(self.baseDir+"/"+self.UIWorkingDir+"/share/.repacked") # time last modified
+                t4 = time.mktime(gmtime())+(60*60) # current time
+                tdiff2=t4-t3
+            else:
+                f = open(self.baseDir+"/"+self.UIWorkingDir+"/share/.repacked","w")
+                f.write("bla")
+                f.close()
+                #tdiff2=100
+
+            #print tdiff2
+
+            if tdiff2 > (5400):
+
+                os.remove(self.baseDir+"/"+self.UIWorkingDir+"/share/.repacked")
+                f = open(self.baseDir+"/"+self.UIWorkingDir+"/share/.repacked","w")
+                f.write("bla")
+                f.close()
+
+                self.output(" ---> CrabHandler::repackProxy - Repacking stageout grid proxy in CRAB SandBox")
+
+                cmd = self.initEnv
+                cmd = cmd+" cd "+self.UIWorkingDir+"/share;"
+                cmd = cmd+" mkdir tmp;"
+                cmd = cmd+" mv -v default.tgz tmp/;"
+                cmd = cmd+" cd tmp;"
+                cmd = cmd+" tar -xzvf default.tgz; rm default.tgz; "
+                cmd = cmd+" cp -v $X509_USER_PROXY tmpfile;"
+                cmd = cmd+" tar -czvf default.tgz *;"
+                cmd = cmd+" mv default.tgz ..;"
+                cmd = cmd+" cd ../;"
+                cmd = cmd+" rm -rfv tmp"
+                
+                p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                p.stdout.read() 
+                    
         
     def checkCEstatus(self,CEname):
 
@@ -1111,7 +1142,6 @@ class CRABHandler:
             self.output(" --> Submitting with whitelist: "+whitelist)
             whiteListLine=' -GRID.ce_white_list='+whitelist.strip()
 
-
         submitLine = "-submit"
         if nCreated > self.nMaxJobsPerSubmit:
             self.submitInWaves=bool(True)
@@ -1146,6 +1176,8 @@ class CRABHandler:
 
                 self.UIWorkingDir = line[line.index('crab_'):line.rindex('/')]
 
+        nSubmitted=1
+        
         self.nJobsCreated=nCreated
 
         #self.output(" ---> According to DBS, the sample contains "+str(nEventsDBS)+" events.")
@@ -1191,7 +1223,8 @@ class CRABHandler:
 
         if os.path.exists(self.baseDir+"/tmpfile"):
             os.remove(self.baseDir+"/tmpfile")
-          
+
+        cycle=int(0)
         while not done:
 
             # check if an abort is requested
@@ -1234,6 +1267,15 @@ class CRABHandler:
 
             #print handler.getJobList()
 
+            migrate=bool(False)
+            cycle=cycle+1
+            if cycle > 4:
+
+                if int(handler.getNStuck()) > 0:
+                    self.output("  ----> "+str(handler.getNStuck())+" jobs are in Submitted/Submitting/Ready/Waiting, migrating them to Failed for resubmission")
+                    migrate=bool(True)                    
+                cycle=0
+
             if not handler.getGetOutputList() == "None" and not self.submitInWaves:
 
                 self.output("  ----> Retrieving crab output for finished jobs: "+handler.getGetOutputList())
@@ -1258,12 +1300,12 @@ class CRABHandler:
 
             #print self.nJobsCreated
             
-            if not handler.getResubmitList() == "None":
+            if not handler.getResubmitList(migrate) == "None":
 
                 blacklist = ""
                 whitelist = ""
 
-                self.output("  ----> Resubmitting aborted jobs: "+handler.getResubmitList())
+                self.output("  ----> Resubmitting aborted jobs: "+handler.getResubmitList(migrate))
 
                 # get blacklisted sites from config
                 blacklistConfig=""
@@ -1333,7 +1375,7 @@ class CRABHandler:
                 outfile.write(out)
                 outfile.close()
                 
-                for i in (handler.getResubmitList()).split(','):
+                for i in (handler.getResubmitList(migrate)).split(','):
                                        
                     try:
                         for line in open(stamp+"_out.txt","r"):
@@ -1355,7 +1397,7 @@ class CRABHandler:
                         a = "b"
                         #self.output("    ------> Unable to check pnfs for obsolete files")
 
-                cmd = self.initEnv+self.crabSource+'; crab -forceResubmit '+handler.getResubmitList()+' '+blacklistCMD+' '+whitelistCMD+' -c '+self.UIWorkingDir
+                cmd = self.initEnv+self.crabSource+'; crab -forceResubmit '+handler.getResubmitList(migrate)+' '+blacklistCMD+' '+whitelistCMD+' -c '+self.UIWorkingDir
                 p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                 output = p.stdout.read()
 
@@ -1682,6 +1724,9 @@ class CRABHandler:
 
 #crab = CRABHandler("",".",logHandler(""))
 
+#crab.checkGridProxy(True) # make it silent to not have massive logfiles
+#crab.checkCredentials(True)
+            
 #crab.createGridProxy()
 
 #crab.runTwoConfigs("lol","lala")
