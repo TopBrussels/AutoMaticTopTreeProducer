@@ -549,7 +549,7 @@ class CRABHandler:
         import random
 
         availProxy = []
-        #availProxy.append("")
+        availProxy.append("")
 
         if os.path.exists(self.proxyDir+"/proxy"):
             for proxy in os.listdir(self.proxyDir+"/proxy"):
@@ -1184,8 +1184,6 @@ class CRABHandler:
             if self.UIWorkingDir == "crab_*" and not line.rfind("working directory") == -1: #if CRAB_2_2_1 we need to set this variable!
 
                 self.UIWorkingDir = line[line.index('crab_'):line.rindex('/')]
-
-        nSubmitted=1
         
         self.nJobsCreated=nCreated
 
