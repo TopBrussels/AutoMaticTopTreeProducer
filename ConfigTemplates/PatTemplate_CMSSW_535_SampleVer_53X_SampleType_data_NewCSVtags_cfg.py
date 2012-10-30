@@ -102,9 +102,9 @@ process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
 process.load('CommonTools/RecoAlgos/HBHENoiseFilter_cfi')
 
 # HCAL laser events filter
-process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
-process.hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
-process.hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
+#process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
+#process.hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
+#process.hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
 
 # ECAL dead cell filter
 process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
@@ -287,7 +287,7 @@ process.patseq = cms.Sequence(
 		process.CSCTightHaloFilter*
 		process.HBHENoiseFilter*
 		process.scrapingVeto*
-		process.hcalLaserEventFilter*
+		#process.hcalLaserEventFilter*
 		process.EcalDeadCellTriggerPrimitiveFilter*
                 process.goodOfflinePrimaryVertices* 
                 process.primaryVertexFilter * #removes events with no good pv (but if cuts to determine good pv change...)
