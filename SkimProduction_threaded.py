@@ -123,6 +123,7 @@ class Request:
     nGroupFiles = int(0)
     publishName = ""
     announce = int(0)
+    walltime = ""
     host = ""
     
     
@@ -269,7 +270,7 @@ class Request:
         cmd += "export X509_USER_PROXY=\""+TopSkimDir+ProxyFile+"\";"
         cmd += "cd "+TopSkimDir+";"
 
-        cmd += "python SkimTopTree.py --srmcp --mtop-runmode --mtop-setuser="+self.Username+" --toptree_location="+self.SamplePath+" -t "+self.WorkingDir+" --skim_xml="+SkimFile+" -j "+str(self.nThreads)+" -n "+str(self.nGroupFiles)+" --email "+self.Email
+        cmd += "python SkimTopTree.py --srmcp --mtop-runmode --mtop-setuser="+self.Username+" --toptree_location="+self.SamplePath+" -t "+self.WorkingDir+" --skim_xml="+SkimFile+" -j "+str(self.nThreads)+" -n "+str(self.nGroupFiles)+" -w "+str(self.walltime)+" --email "+self.Email
         #cmd += "python SkimTopTree.py --mtop-runmode --mtop-setuser="+self.Username+" --toptree_location="+self.SamplePath+" --skim_xml="+SkimFile+" -n "+str(self.nThreads)+" -j "+str(self.nGroupFiles)+" --email "+self.Email
 
         if self.host == "PBS":
@@ -378,9 +379,10 @@ class RequestHandler:
                 request.WorkingDir = sqlRes[7]
                 request.nThreads = int(sqlRes[8])
                 request.nGroupFiles = int(sqlRes[9])
-                request.publishName = sqlRes[10]
-                request.announce = int(sqlRes[11])
-                request.host = sqlRes[12]
+                request.walltime = sqlRes[10]
+                request.publishName = sqlRes[11]
+                request.announce = int(sqlRes[12])
+                request.host = sqlRes[13]
 
                 #print request.ID+" "+request.SamplePath+" "+request.Username
 

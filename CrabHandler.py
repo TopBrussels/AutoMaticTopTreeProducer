@@ -165,9 +165,6 @@ class CrabStatusParser(ContentHandler):
 
                 elif int(nResubmits) < self.maxResubmit and (not state.rfind("Cancelled") == -1 or not state.rfind("Aborted") == -1 or not state.rfind("CannotSubmit") == -1):
                     resubmit += jobId+','
-
-                elif int(nResubmits) < self.maxResubmit and (not statusReason.rfind("Terminated") == -1):
-                    resubmit += jobId+','
                     
                 elif int(nResubmits) < self.maxResubmit and (state == "Submitted" and migrate):
                     resubmit += jobId+','
@@ -369,14 +366,19 @@ class CRABHandler:
 
                 validfor = (t1-t2)/(60*60*24) # time diff in days
 
+                user=(file.split("_")[1]).split(".")[0]
+
+                if os.path.exists(self.proxyDir+"/proxy/proxy_"+user+".expiresSoon"):
+                    os.remove(self.proxyDir+"/proxy/proxy_"+user+".expiresSoon")
+                    
                 if validfor < 30:
                     self.output("CranHandler::createGridProxy - Certificate "+file+" expires in "+str(validfor)+" days, please install a new one. Skipped!")
-                    continue
+                    #continue
+                    Popen("touch "+self.proxyDir+"/proxy/proxy_"+user+".expiresSoon", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                    
 
                 #create the proxy
                 
-                user=(file.split("_")[1]).split(".")[0]
-
                 cmd = "voms-proxy-init --voms cms:/cms/becms --valid 190:00 -cert "+self.proxyDir+"/usercert_"+user+".pem -key ~/.globus/.altcert/userkey_"+user+".pem -out "+self.proxyDir+"/proxy/proxy_"+user+" -pwstdin"
 
                 #print cmd
@@ -546,15 +548,29 @@ class CRABHandler:
 
     def pickProxy(self):
 
+        #return "" # disable the system
+
         import random
 
         availProxy = []
-        availProxy.append("")
+        availProxy.append("") # dhondt cert
 
+        exclude=""
         if os.path.exists(self.proxyDir+"/proxy"):
             for proxy in os.listdir(self.proxyDir+"/proxy"):
-                availProxy.append(self.proxyDir+"/proxy/"+proxy)
+                if not proxy.rfind(".expiresSoon") == -1:
+                    exclude = exclude+" "+proxy
 
+        print exclude
+        
+        if os.path.exists(self.proxyDir+"/proxy"):
+            for proxy in os.listdir(self.proxyDir+"/proxy"):
+                if proxy.rfind(".expiresSoon") == -1:
+                    if exclude.rfind(proxy) == -1:
+                        #print proxy
+                        availProxy.append(self.proxyDir+"/proxy/"+proxy)
+                    else:
+                        self.output("  ---> CrabHandler::pickProxy - skipping GRID proxy <"+str(proxy)+"> since it expires in <30days")
         #print availProxy
         #print self.proxyDir
 
@@ -854,7 +870,8 @@ class CRABHandler:
 	outFile.write('[CRAB]\n')
 	outFile.write('jobtype = cmssw\n')
 
-        outFile.write('scheduler = glite\n')
+        #outFile.write('scheduler = glite\n')
+        outFile.write('scheduler = remoteGlidein\n')
 
         if not self.serverName == "None":
             outFile.write('use_server = 1\n\n')
@@ -950,7 +967,7 @@ class CRABHandler:
 	outFile.write('virtual_organization = cms\n')
 	outFile.write('group = becms\n')
         if not blackList == "":
-            outFile.write('ce_black_list = '+blackList+'\n')
+            outFile.write('se_black_list = '+blackList+'\n')
 	outFile.write('lcg_catalog_type = lfc\n')
 	outFile.write('lfc_host = lfc-cms-test.cern.ch\n')
 	outFile.write('lfc_home = /grid/cms\n')
@@ -1118,7 +1135,7 @@ class CRABHandler:
 
 	self.output("--> Creating CRAB Jobs for "+self.UIWorkingDir+ " ("+self.getVersion()+")")
 
-        cmd = self.initEnv+self.crabSource+'; crab -create -cfg ' + self.crabFileName+' -GRID.ce_black_list='+blacklist.strip()+' >& '+logFileName
+        cmd = self.initEnv+self.crabSource+'; crab -create -cfg ' + self.crabFileName+' -GRID.se_black_list='+blacklist.strip()+' >& '+logFileName
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
 	output = p.stdout.read()
 
@@ -1141,7 +1158,7 @@ class CRABHandler:
 
         if not blacklist == "":
             self.output(" --> Submitting with blacklist: "+blacklist)
-            blackListLine=' -GRID.ce_black_list='+blacklist.strip()
+            blackListLine=' -GRID.se_black_list='+blacklist.strip()
 
         # whitelist
 
@@ -1228,8 +1245,8 @@ class CRABHandler:
 
         done=bool(False)
 
-        if os.path.exists(self.baseDir+"/tmpfile"):
-            os.remove(self.baseDir+"/tmpfile")
+        #if os.path.exists(self.baseDir+"/tmpfile"):
+        #    os.remove(self.baseDir+"/tmpfile")
 
         cycle=int(0)
         while not done:
@@ -1260,8 +1277,10 @@ class CRABHandler:
             self.checkCredentials(True)
 
             self.repackProxy()
+
+            logSFileName = "log_status_"+self.crabFileName
             
-            cmd = self.initEnv+self.crabSource+';crab -status -c '+self.UIWorkingDir+' -USER.xml_report=output.xml >& crab.status'
+            cmd = self.initEnv+self.crabSource+';crab -status -c '+self.UIWorkingDir+' -USER.xml_report=output.xml >& '+logSFileName
             p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
             output = p.stdout.read()
 
@@ -1286,8 +1305,10 @@ class CRABHandler:
             if not handler.getGetOutputList() == "None" and not self.submitInWaves:
 
                 self.output("  ----> Retrieving crab output for finished jobs: "+handler.getGetOutputList())
-                    
-                cmd = self.initEnv+self.crabSource+'; crab -get '+handler.getGetOutputList()+' -c '+self.UIWorkingDir
+
+                logFileName = "log_getoutput_"+self.crabFileName
+                                
+                cmd = self.initEnv+self.crabSource+'; rm -fv '+self.UIWorkingDir+'/res/Submission_*/*.tgz; crab -get '+handler.getGetOutputList()+' -c '+self.UIWorkingDir+' >& '+logFileName
                 p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                 output = p.stdout.read()
                 #print cmd
@@ -1295,7 +1316,7 @@ class CRABHandler:
 
                 if self.serverName == "None": # if standalone we need to check the status again after get
 
-                    cmd = self.initEnv+self.crabSource+';crab -status -c '+self.UIWorkingDir+' -USER.xml_report=output.xml'
+                    cmd = self.initEnv+self.crabSource+';crab -status -c '+self.UIWorkingDir+' -USER.xml_report=output.xml >& '+logSFileName
                     p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                     output = p.stdout.read()
             
@@ -1353,7 +1374,7 @@ class CRABHandler:
                     file.close()
 
                 if not blacklist == "":
-                    blacklistCMD = "-GRID.ce_black_list="+blacklist
+                    blacklistCMD = "-GRID.se_black_list="+blacklist
                 else:
                     blacklistCMD = ""
 
@@ -1479,7 +1500,7 @@ class CRABHandler:
                     file.close()
 
                 if not blacklist == "":
-                    blacklistCMD = "-GRID.ce_black_list="+blacklist
+                    blacklistCMD = "-GRID.se_black_list="+blacklist
                 else:
                     blacklistCMD = ""
 

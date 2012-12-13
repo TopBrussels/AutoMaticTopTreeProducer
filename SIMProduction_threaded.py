@@ -493,7 +493,7 @@ while True:
 
     if nWorkers == 0:
 
-        time.sleep(600)
+        time.sleep(3600)
 
         continue
 

@@ -105,6 +105,13 @@ class TopTreeProducer:
             elif not line.rfind("process.source = cms.Source"):
                 inPoolSource=bool(True)
 
+                if not line.rfind("))") == -1: # meaning that the poolsource is one line
+
+                    TTFile.write("process.source = cms.Source(\"PoolSource\",fileNames = cms.untracked.vstring(\'file:"+self.timeStamp+"_PAT.root\'))\n")
+                    inPoolSource=bool(False)
+
+                    changedPoolSource = bool(True)
+
             elif not line.rfind("fileNames = cms.untracked.vstring") == -1:
 
                 if not changedPoolSource:
@@ -113,9 +120,6 @@ class TopTreeProducer:
                 
                     TTFile.write("process.source = cms.Source(\"PoolSource\",fileNames = cms.untracked.vstring(\'file:"+self.timeStamp+"_PAT.root\'))\n")
 
-                    if not line.rfind("))") == -1: # meaning that the poolsource is one line
-
-                        inPoolSource=bool(False)
 
             elif inPoolSource and not line.rfind(")") == -1 and line.rfind("(") == -1 and line.rfind("fileNames") == -1:
                 inPoolSource=bool(False)

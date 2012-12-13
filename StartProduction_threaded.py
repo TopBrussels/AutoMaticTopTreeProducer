@@ -150,10 +150,6 @@ class Request:
 
             cmd += " --flavourHistoryFilterPath="+str(self.FLFilterPath)
 
-        if not self.RunSelection == "NULL" and not self.RunSelection == "":
-
-            cmd += " -r "+str(self.RunSelection)
-
         if not self.useLocalDBS == "":
 
             cmd += " --dbsInst "+self.useLocalDBS
@@ -163,6 +159,10 @@ class Request:
             cmd += " -t "+self.DataTier
 
         cmd += " --setLogFile logs/log-TopDB-Request-"+str(self.ID)+".txt"
+
+        if not self.RunSelection == "NULL" and not self.RunSelection == "":
+
+            cmd += " -r "+str(self.RunSelection)
 
         #if options.stdout:
         #    cmd += " --log-stdout"
@@ -264,6 +264,10 @@ class RequestHandler:
             
             line = res.split("\n")[0]
             sqlRes = line.split("	")
+
+            if len(sqlRes) < 11:
+                continue
+            
             if not sqlRes[1].rfind("/") == -1:
                 request = Request()
                 
