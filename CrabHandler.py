@@ -1287,8 +1287,7 @@ class CRABHandler:
             cmd = self.initEnv+self.crabSource+' crab -status -c '+self.UIWorkingDir+' -USER.xml_report=output.xml >& '+logSFileName
             p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
             output = p.stdout.read()
-            #print output
-            
+
             parser = make_parser()
             handler = CrabStatusParser()
             parser.setContentHandler(handler)
@@ -1296,10 +1295,10 @@ class CRABHandler:
 
             self.output(handler.getStatus())
 
-            for sub in os.listdir(self.UIWorkingDir+"/res"):
+            for sub in os.listdir(self.baseDir+"/"+self.UIWorkingDir+"/res"):
                 if not sub.rfind("Submission") == -1:
                     self.output("   -----> Removing leftover Submission dir: "+self.UIWorkingDir+"/res/"+sub)
-                    shutil.rmtree(self.UIWorkingDir+"/res/"+sub)
+                    shutil.rmtree(self.baseDir+"/"+self.UIWorkingDir+"/res/"+sub)
 
             #print handler.getJobList()
 
