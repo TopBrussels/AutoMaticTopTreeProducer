@@ -23,6 +23,10 @@ from xml.sax.handler import ContentHandler
 
 from DBSHandler import DBSHandler
 
+# import util to remove full dir trees
+
+import shutil
+
 class CrabStatusParser(ContentHandler):
     
     # constructor
@@ -1291,10 +1295,15 @@ class CRABHandler:
 
             self.output(handler.getStatus())
 
+            for sub in os.listdir(self.UIWorkingDir+"/res"):
+                if not sub.rfind("Submission") == -1:
+                    self.output("   -----> Removing leftover Submission dir: "+self.UIWorkingDir+"/res/"+sub)
+                    shutil.rmtree(self.UIWorkingDir+"/res/"+sub)
+
             #print handler.getJobList()
 
             #disable this for remoteGlidein
-            #migrate=bool(False)
+            migrate=bool(False)
             #cycle=cycle+1
             #if cycle > 24:
 
@@ -1309,7 +1318,7 @@ class CRABHandler:
 
                 logFileName = "log_getoutput_"+self.crabFileName
                                 
-                cmd = self.initEnv+self.crabSource+'; rm -fv '+self.UIWorkingDir+'/res/Submission_*/*.tgz; crab -get '+handler.getGetOutputList()+' -c '+self.UIWorkingDir+' >& '+logFileName
+                cmd = self.initEnv+self.crabSource+'; crab -get '+handler.getGetOutputList()+' -c '+self.UIWorkingDir+' >& '+logFileName
                 p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                 output = p.stdout.read()
                 #print cmd
