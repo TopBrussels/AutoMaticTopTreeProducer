@@ -1284,10 +1284,11 @@ class CRABHandler:
 
             logSFileName = "log_status_"+self.crabFileName
             
-            cmd = self.initEnv+self.crabSource+';crab -status -c '+self.UIWorkingDir+' -USER.xml_report=output.xml >& '+logSFileName
+            cmd = self.initEnv+self.crabSource+' crab -status -c '+self.UIWorkingDir+' -USER.xml_report=output.xml >& '+logSFileName
             p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
             output = p.stdout.read()
-
+            print output
+            
             parser = make_parser()
             handler = CrabStatusParser()
             parser.setContentHandler(handler)
@@ -1318,7 +1319,7 @@ class CRABHandler:
 
                 logFileName = "log_getoutput_"+self.crabFileName
                                 
-                cmd = self.initEnv+self.crabSource+'; crab -get '+handler.getGetOutputList()+' -c '+self.UIWorkingDir+' >& '+logFileName
+                cmd = self.initEnv+self.crabSource+' crab -get '+handler.getGetOutputList()+' -c '+self.UIWorkingDir+' >& '+logFileName
                 p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                 output = p.stdout.read()
                 #print cmd
@@ -1326,7 +1327,7 @@ class CRABHandler:
 
                 if self.serverName == "None": # if standalone we need to check the status again after get
 
-                    cmd = self.initEnv+self.crabSource+';crab -status -c '+self.UIWorkingDir+' -USER.xml_report=output.xml >& '+logSFileName
+                    cmd = self.initEnv+self.crabSource+'; crab -status -c '+self.UIWorkingDir+' -USER.xml_report=output.xml >& '+logSFileName
                     p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                     output = p.stdout.read()
             
