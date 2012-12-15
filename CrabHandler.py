@@ -1293,14 +1293,15 @@ class CRABHandler:
 
             #print handler.getJobList()
 
-            migrate=bool(False)
-            cycle=cycle+1
-            if cycle > 4:
+            #disable this for remoteGlidein
+            #migrate=bool(False)
+            #cycle=cycle+1
+            #if cycle > 24:
 
-                if int(handler.getNStuck()) > 0:
-                    self.output("  ----> "+str(handler.getNStuck())+" jobs are in Submitted/Submitting/Ready/Waiting, migrating them to Failed for resubmission")
-                    migrate=bool(True)                    
-                cycle=0
+            #    if int(handler.getNStuck()) > 0:
+            #        self.output("  ----> "+str(handler.getNStuck())+" jobs are in Submitted/Submitting/Ready/Waiting, migrating them to Failed for resubmission")
+            #        migrate=bool(True)                    
+            #    cycle=0
 
             if not handler.getGetOutputList() == "None" and not self.submitInWaves:
 
@@ -1446,6 +1447,10 @@ class CRABHandler:
                 cmd = self.initEnv+self.crabSource+'; crab -submit '+blacklistCMD+' -c '+self.UIWorkingDir
                 p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                 output = p.stdout.read()
+
+                self.output("  ----> Jobs resubmitted, sleeping "+str(self.idleTimeResubmit)+"s.")
+
+                time.sleep(self.idleTimeResubmit)
     
             elif (handler.nCreated == 0 or handler.nCreated == self.nJobsFailedToSubmit) and handler.nReady == 0 and handler.nSubmitting == 0 and handler.nSubmitted == 0 and handler.nWaiting == 0 and handler.nScheduled == 0 and handler.nRunning == 0 and not firstPoll:
 

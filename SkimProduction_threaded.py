@@ -367,6 +367,9 @@ class RequestHandler:
             line = res.split("\n")[0]
             sqlRes = line.split("	")
 
+            if len(sqlRes) < 10:
+                continue
+
             if sqlRes[0].rfind("ID") == -1:
 
                 request = Request();

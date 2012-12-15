@@ -239,6 +239,8 @@ class Request:
         storagePathTop = []
         mergedTopLocation = []
 
+        storagePathTopMail=[]
+
         ## REMOVE ONLY TOPTREE
         if self.removeType == "toptree":
             
@@ -335,7 +337,7 @@ class Request:
 
                 #if dir.rfind("7TeV_T2") == -1: continue # this is just to make testing go fast
         
-                pExe = Popen("find /pnfs/iihe/cms/store/user/dhondt/"+dir+" -name *.root", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                pExe = Popen("find /pnfs/iihe/cms/store/user/dhondt/"+dir+" -name TOPTREE", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     
                 out = pExe.stdout.read()
         
@@ -350,7 +352,7 @@ class Request:
                     dirName = dirName.rstrip("/")
 
                     if dirs.count(dirName) == 0 and len(dirName) > 0:
-                        dirs.append(dirName)
+                        dirs.append(dirName+"/TOPTREE")
 
 
             self.log.output("  ----> "+str(len(dirs))+" directory(s) found in total, cross-referencing TopDB...")
@@ -373,7 +375,7 @@ class Request:
                 
                 result4 = self.sql.execQuery().split('\n')
         
-                if len(result) < 2 and len(result2) < 2 and len(result3) < 2 and len(result4) < 2 and storagePathTop.count(dirs[i]) == 0:
+                if len(result) < 2 and len(result2) < 2 and len(result3) < 2 and len(result4) < 2 and storagePathTopMail.count(dirs[i]) == 0:
 
                     filestat = os.stat(dirs[i])
                     
@@ -389,10 +391,10 @@ class Request:
 
                         self.log.output("  ----> Directory "+dirs[i]+" is not in TopDB, it should be removed! (Age: "+str(time_diff/(60*60*24))+" days)")
 
-                        idTop.append(-9999)
-                        storagePathTop.append(dirs[i])
+                        #idTop.append(-9999)
+                        storagePathTopMail.append(dirs[i])
 
-            self.log.output("  ----> "+str(len(storagePathTop))+" directory(s) need removal!")
+            self.log.output("  ----> "+str(len(storagePathTopMail))+" directory(s) need removal!")
     
             self.log.output(" ---> Searching for PATuples that don't have a TopTree assigned")
 
@@ -420,12 +422,33 @@ class Request:
 
                         found=bool(True)
 
-                if not found:
+                #if not found:
 
-                    id.append(i.split("\t")[0])
-                    storagePath.append(i.split("\t")[1])
-                    dbsPublish.append(i.split("\t")[2])
-                    CffFilePath.append(i.split("\t")[3])
+                    #id.append(i.split("\t")[0])
+                    #storagePath.append(i.split("\t")[1])
+                    #dbsPublish.append(i.split("\t")[2])
+                    #CffFilePath.append(i.split("\t")[3])
+
+            msg = "Dear admins,"
+
+            if len(storagePathTopMail) > 0:
+                msg += "\n\n The automatic TopDB PNFS cleaning tool has found "+str(len(storagePathTopMail))+" directories on PNFS not corresponding to any entry in the TopDB database."
+
+                msg += "\n\n Please have a look at the following list:"
+
+                for s in storagePathTopMail:
+
+                    msg += "\n\n \t rm -rfv "+s
+
+            else:
+                msg += "\n\n The automatic TopDB PNFS cleaning tool has found NO directories on PNFS not corresponding to any entry in the TopDB database."
+
+            msg += "\n\nCheers,\nHector the cleaning agent"
+
+            mail = MailHandler()
+
+            mail.sendMail("error","Report from TopDB PNFS cleaning",msg)
+
 
         ## CLEAN LEFTOVER FILES FROM FAILED PRODUCTION, CLEAN PATUPLES WITHOUT ANY TOPTREES
         elif self.removeType == "cleancrablogs":
