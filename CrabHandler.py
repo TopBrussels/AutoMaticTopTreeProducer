@@ -161,6 +161,9 @@ class CrabStatusParser(ContentHandler):
             appExitCode = job.split(":")[3]
             wrapExitCode = job.split(":")[4]
             statusReason = job.split(":")[5]
+
+            if not resubmit.rfind(jobId) == -1:
+                continue
                         
             if not state == "Created":
 
