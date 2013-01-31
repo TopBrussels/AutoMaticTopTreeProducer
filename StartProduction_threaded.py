@@ -300,6 +300,9 @@ class RequestHandler:
                         line = res.split("\n")[0]
                         sqlRes = line.split("	")
 
+                        if len(sqlRes) < 2:
+                            continue
+
                         if not sqlRes[0] == "CMSSWversion":
                             
                             #print "Ver: "+sqlRes[0]

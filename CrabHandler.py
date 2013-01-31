@@ -568,13 +568,15 @@ class CRABHandler:
                 if not proxy.rfind(".expiresSoon") == -1:
                     exclude = exclude+" "+proxy
 
-        print exclude
+        #exclude = exclude+" proxy_gvonsem" # temp disable this proxy
+        
+        #print exclude
         
         if os.path.exists(self.proxyDir+"/proxy"):
             for proxy in os.listdir(self.proxyDir+"/proxy"):
                 if proxy.rfind(".expiresSoon") == -1:
                     if exclude.rfind(proxy) == -1:
-                        #print proxy
+                        #print proxy                        
                         availProxy.append(self.proxyDir+"/proxy/"+proxy)
                     else:
                         self.output("  ---> CrabHandler::pickProxy - skipping GRID proxy <"+str(proxy)+"> since it expires in <30days")
@@ -1109,7 +1111,27 @@ class CRABHandler:
 
             return bool(True)
 
-        else: # no need to rescale if # events >10M
+        elif nEventsDBS < 100000000: # events <40M
+
+            self.nEventsPerJob_server = str(30000*scalefactor)
+
+            self.nEventsPerJob = str(30000*scalefactor)
+
+            self.output(" ---> Changing #events/job to "+self.nEventsPerJob_server)
+
+            return bool(True)
+
+        elif nEventsDBS < 150000000: # events <40M
+
+            self.nEventsPerJob_server = str(40000*scalefactor)
+
+            self.nEventsPerJob = str(40000*scalefactor)
+
+            self.output(" ---> Changing #events/job to "+self.nEventsPerJob_server)
+
+            return bool(True)
+
+        else: # no need to rescale
 
             self.output(" ---> Ok, leaving the # of events per job unchanged")
             

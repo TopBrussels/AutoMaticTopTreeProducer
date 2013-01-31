@@ -387,7 +387,7 @@ class Request:
                     
                     time_diff=now-last_mod
                     
-                    if time_diff/(60*60) > 480: # just want the dir to be old enough to not remove ongoing prod
+                    if time_diff/(60*60) > 720: # just want the dir to be old enough to not remove ongoing prod
 
                         self.log.output("  ----> Directory "+dirs[i]+" is not in TopDB, it should be removed! (Age: "+str(time_diff/(60*60*24))+" days)")
 
@@ -522,6 +522,14 @@ class Request:
                                 keepstderr=""
                                 keepxml=""
 
+                                if os.path.exists(crabdir+"/log/crab.log"):
+
+                                    self.log.output("    ---> Cleaning crab.log in "+crabdir+"/log/ (Age: "+str(time_diff/(3600*24))+" days)")
+
+                                    os.unlink(crabdir+"/log/crab.log")
+
+                                    #sys.exit(1)
+                                    
                                 for file in os.listdir(crabdir+"/res"):
 
                                     if not file.rfind(".stdout") == -1:
@@ -591,6 +599,8 @@ class Request:
             self.log.output("  ----> "+str(len(ldirs))+" Configuration directory(s) found in total, cross-referencing TopDB...")
 
             self.log.output("")
+
+            ldirs = [] # disable this for now
             
             for i in xrange(0,len(ldirs)):
 
@@ -622,9 +632,9 @@ class Request:
                     
                     time_diff=now-last_mod
                     
-                    if time_diff/(60*60) > 480: # just want the dir to be old enough to not remove ongoing prod
+                    if time_diff/(60*60*24) > days: # just want the dir to be old enough to not remove ongoing prod
                         
-                        self.log.output("  ----> Directory "+ldirs[i]+" is not in TopDB, it should be removed! (Age: "+str(time_diff/(60*60*23))+" days)")
+                        self.log.output("  ----> Directory "+ldirs[i]+" is not in TopDB, it should be removed! (Age: "+str(time_diff/(60*60*24))+" days)")
                         
                         cleanup_ldirsToRemove.append(ldirs[i])
                         

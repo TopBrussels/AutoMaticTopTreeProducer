@@ -7,5 +7,4 @@ crab.createGridProxy()
 
 crab.createMyProxyCredentials()
 
-
-#crab.pickProxy()
+#print crab.pickProxy()
