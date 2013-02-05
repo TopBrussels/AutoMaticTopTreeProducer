@@ -45,22 +45,15 @@ import threading
 class Request:
 
     ID=int(0)
-    Type=""
     Campaign=""
     CMSSW_sim=""
     GT_sim=""
-    PublishName_sim=""
-    CMSSW_rec=""
-    GT_rec=""
-    PublishName_rec=""
+    PublishName_sim=""    
     CMSSW_top=""
     GT_top=""
     nEvents=""
     LHEDir=""
     Template=""
-    
-    DBSInst=""
-    DBSsample=""
 
     Priority=int(0)
 
@@ -118,42 +111,19 @@ class Request:
         publish=""
         template=""
         LHEDir=""
-        SKIPRECO=""
-
-        DBS=""
-        SAMPLE=""
         
-        if not self.Type.rfind("GEN-SIM") == -1:
-            template=" -f "+self.Template+" "
-            LHEDir="-d "+self.LHEDir+" "
-            if not self.Type.rfind("DIGI-RECO") == -1:
-                cmssw=self.CMSSW_sim+","+self.CMSSW_rec
-                gt=self.GT_sim+","+self.GT_rec
-                publish=self.PublishName_sim+","+self.PublishName_rec 
-            else:
-                cmssw=self.CMSSW_sim
-                gt=self.GT_sim
-                publish=self.PublishName_sim
-                SKIPRECO=" -s "
-        else:
-            cmssw=self.CMSSW_rec
-            gt=self.GT_rec
-            publish=self.PublishName_rec
-            DBS=" --dbsInst "+self.DBSInst
-            SAMPLE=" --start-from-produced-sim="+self.DBSsample+" "
-            
+        template=" -f "+self.Template+" "
+        LHEDir="-d "+self.LHEDir+" "
+        cmssw=self.CMSSW_sim
+        gt=self.GT_sim
+        publish=self.PublishName_sim
+          
         cmd ="python AutoMaticSIMProducer.py -c "+cmssw+" -g "+gt+" -p "+publish+" -a "+self.Campaign
 
         if not template == "":
             cmd+=template
         if not LHEDir == "":
             cmd+=LHEDir
-        if not DBS=="":
-            cmd+=DBS
-        if not SAMPLE=="":
-            cmd+=SAMPLE
-        if not SKIPRECO=="":
-            cmd+=SKIPRECO
     
         if not self.nEvents == "":
             cmd+=" -n "+self.nEvents
@@ -171,12 +141,7 @@ class Request:
         #print cmd
 
         #sys.exit(1)
-        #return 0
-
-        #print self.DBSsample.split("\n")
-        #print SAMPLE.split("\n")
-        #sys.exit(1)
-         
+        #return 0         
 
         #cmd = "sleep 1"
 
@@ -262,30 +227,19 @@ class RequestHandler:
                 request = Request()
                 
                 request.ID = sqlRes[0]
-                request.Type=sqlRes[3]
-                request.Campaign=sqlRes[4]
+                request.Campaign=sqlRes[3]
 
-                if not request.Type.rfind("GEN-SIM") == -1:
-                    request.CMSSW_sim=sqlRes[5]
-                    request.GT_sim=sqlRes[6]
-                    request.nEvents=sqlRes[17]
-                    request.LHEDir=sqlRes[16]
-                    request.Template=sqlRes[7]
-                    request.PublishName_sim=sqlRes[14]
-
-                if not request.Type.rfind("DIGI-RECO") == -1:                        
-                    request.CMSSW_rec=sqlRes[8]
-                    request.GT_rec=sqlRes[9]
-
-                    if request.Type.rfind("GEN-SIM") == -1:
-                        request.DBSInst=sqlRes[10]
-                        request.DBSsample=sqlRes[13]
-                    
+                request.CMSSW_sim=sqlRes[4]
+                request.GT_sim=sqlRes[5]
+                request.nEvents=sqlRes[11]
+                request.LHEDir=sqlRes[10]
+                request.Template=sqlRes[6]
+                request.PublishName_sim=sqlRes[9]                 
 
                 request.CMSSW_top=""
                 request.GT_top=""
 
-                request.Priority = int(sqlRes[18])
+                request.Priority = int(sqlRes[12])
             
                 if not request.Priority == 0:
 
@@ -324,21 +278,19 @@ class WorkFlow (threading.Thread ):
 
             request = requestsPool.get()
 
-            if not request.Type == "":
+            log.output("--> Starting production for request "+request.ID)
 
-                log.output("--> Starting production for request "+request.ID)
+            request.setRunning()
 
-                request.setRunning()
-
-                exitCode = request.process() # running AutoMaticSIMProducer
+            exitCode = request.process() # running AutoMaticSIMProducer
                     
-                if exitCode == 0:
+            if exitCode == 0:
 
                     log.output("--> Production for request "+request.ID+" is finished, removing request from TopDB!")
 
                     request.setDone()
 
-                elif exitCode == 1:
+            elif exitCode == 1:
 
                     log.output(" ---> The script encountered a python error for request "+request.ID+", sending email to admins!")
 
@@ -354,7 +306,7 @@ class WorkFlow (threading.Thread ):
 
                     #sys.exit(1)
 
-                elif exitCode == 2:
+            elif exitCode == 2:
 
                     log.output(" ---> Something is wrong in the configuration for request "+request.ID+". Disabling this entry and sending a mail for manual intervention")
 
