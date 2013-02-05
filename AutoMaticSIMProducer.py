@@ -1,4 +1,4 @@
-## This script will automatically process any given LHE file into a GEN-SIM-DIGI and RECO dataset
+## This script will automatically process any given LHE file into a FASTSIM 'AOD' dataset 
 
 # for command line options
 from optparse import OptionParser
@@ -39,11 +39,8 @@ from MailHandler import MailHandler
 # import interface to topDB
 from sqlHandler import topDBInterface
 
-# import GENSIMProducer class
-from GENSIMProducer import GENSIMProducer
-
-# import RECOProducer class
-from RECOProducer import RECOProducer
+# import GENFASTSIMProducer class
+from GENFASTSIMProducer import GENFASTSIMProducer
 
 ################################
 ## PLACE TO PUT THE FUNCTIONS ##
@@ -84,34 +81,40 @@ def setupDirs(baseDir,publish):
     return dir[len(dir)-1]
 
 def checkCMSSW(ver,type):
-
+    
+    global setarchitecture
+    setarchitecture = ""
+		
     log.output("\t\t--> Checking if you have a "+ver+" release.")
 
     if os.path.isdir(ver):
         log.output("\t\t\t---> Ok, the release is present!")
-        cmd ='cd '+options.cmssw_ver+'; cmsenv'
+        cmd = 'cd '+options.cmssw_ver+'; cd src; cmsenv'
+        if not ver.rfind("CMSSW_5_") == -1:
+            log.output("\t\t\t---> CMSSW_5_X_Y release, setting scram arch to slc5_amd64_gcc462")
+            setarchitecture = "export SCRAM_ARCH=\"slc5_amd64_gcc462\";"
         pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     else:
         log.output("\t\t\t---> ERROR: Please scram the proper release first! (Exiting)")
-        dieOnError("Environment: resquested CMSSW version is not found in the working directory")
+        dieOnError("Environment: requested CMSSW version is not found in the working directory")
 
     if type == "gen":
 
-        log.output("\t\t--> Checking if "+ver+" contains Configuration/GenProduction/python/")
+        log.output("\t\t--> Checking if "+ver+" contains Configuration/GenProduction/python/EightTeV/")
 
-        if os.path.isdir(ver+"/src/Configuration/GenProduction/python/"):
+        if os.path.isdir(ver+"/src/Configuration/GenProduction/python/EightTeV/"):
             log.output("\t\t\t---> Ok, the directory exists!")
         else:
-            log.output("\t\t\t---> ERROR: Please ensure that you have Configuration/GenProduction/python/ checked out! (Exiting)")
-            dieOnError("Environment: resquested CMSSW version does not contain Configuration/GenProduction/python/")
+            log.output("\t\t\t---> ERROR: Please ensure that you have Configuration/GenProduction/python/EightTeV/ checked out! (Exiting)")
+            dieOnError("Environment: requested CMSSW version does not contain Configuration/GenProduction/python/EightTeV/")
 
-        log.output("\t\t--> Checking if Configuration/GenProduction/python/ contains the requested config template: "+options.configfile)
+        log.output("\t\t--> Checking if Configuration/GenProduction/python/EightTeV/ contains the requested config template: "+options.configfile)
 
-        if os.path.exists(ver+"/src/Configuration/GenProduction/python/"+options.configfile):
+        if os.path.exists(ver+"/src/Configuration/GenProduction/python/EightTeV/"+options.configfile):
             log.output("\t\t\t---> Ok, the file exists!")
         else:
-            log.output("\t\t\t---> ERROR: Please ensure that you place "+options.configfile+" inside Configuration/GenProduction/python/! (Exiting)")
-            dieOnError("Environment: resquested config template "+options.configfile+" not found in Configuration/GenProduction/python/")
+            log.output("\t\t\t---> ERROR: Please ensure that you place "+options.configfile+" inside Configuration/GenProduction/python/EightTeV/! (Exiting)")
+            dieOnError("Environment: requested config template "+options.configfile+" not found in Configuration/GenProduction/python/EightTeV/")
 
 def checkGT(gt):
 
@@ -119,7 +122,7 @@ def checkGT(gt):
 
     if gt == "" or gt.rfind("::All") == -1:
         log.output("\t\t\t---> ERROR: Please ensure that you have provided a proper global tag! (Exiting)")
-        dieOnError("Environment: resquested global tag "+gt+" is not of the right format")
+        dieOnError("Environment: requested global tag "+gt+" is not of the right format")
     else:
         log.output("\t\t\t---> Ok, "+gt+" is a valid GlobalTag!")
         
@@ -132,10 +135,6 @@ def inputSummary():
     global gt_sim
     global publish_sim
 
-    global cmssw_rec
-    global gt_rec
-    global publish_rec
-
     global cmssw_toptree
     global gt_toptree
 
@@ -144,20 +143,13 @@ def inputSummary():
     if not cmssw_sim == "":
 
         if not options.nEvents == -1:
-            log.output("\t* GEN-SIM <-> CMSSW: "+cmssw_sim+" <-> GlobalTag: "+gt_sim+" <-> Publish As: "+publish_sim+" <-> Config Template: "+options.configfile+" <-> #events to process: "+str(options.nEvents)+" *")
+            log.output("\t* GEN-FASTSIM <-> CMSSW: "+cmssw_sim+" <-> GlobalTag: "+gt_sim+" <-> Publish As: "+publish_sim+" <-> Config Template: "+options.configfile+" <-> #events to process: "+str(options.nEvents)+" *")
         else:
-            log.output("\t* GEN-SIM <-> CMSSW: "+cmssw_sim+" <-> GlobalTag: "+gt_sim+" <-> Publish As: "+publish_sim+" <-> Config Template: "+options.configfile+" <-> #events to process: all *")
+            log.output("\t* GEN-FASTSIM <-> CMSSW: "+cmssw_sim+" <-> GlobalTag: "+gt_sim+" <-> Publish As: "+publish_sim+" <-> Config Template: "+options.configfile+" <-> #events to process: all *")
 
         checkCMSSW(cmssw_sim,"gen")
 
         checkGT(gt_sim)
-                   
-    if not options.skipreco:
-        log.output("\t* DIGI-RECO <-> CMSSW: "+cmssw_rec+" <-> GlobalTag: "+gt_rec+" <-> Publish As: "+publish_rec+" *")
-        
-        checkCMSSW(cmssw_rec,"")
-        
-        checkGT(gt_rec)
         
         if not cmssw_toptree == "":
             log.output("\t* PAT-TOPTREE <-> CMSSW: "+cmssw_toptree+" <-> GlobalTag: "+gt_toptree+" *")
@@ -166,9 +158,9 @@ def inputSummary():
             
             checkGT(gt_toptree)
 
-def processGENSIM():
+def processGENFASTSIM():
 
-    log.output(" ----> Preparing to produce the GEN-SIM sample <----")
+    log.output(" ----> Preparing to produce the GEN-FASTSIM sample <----")
 
     startTime = gmtime()
 
@@ -180,16 +172,16 @@ def processGENSIM():
     global gt_sim
     global publish_sim
 
-    global GENSIM_CFFPath
-    global GENSIM_PublishName
-    global GENSIM_nEvents
-    global GENSIM_PNFSLocation
-    global GENSIM_jobEff
-    global GENSIM_LHEFiles
+    global GENFASTSIM_CFFPath
+    global GENFASTSIM_PublishName
+    global GENFASTSIM_nEvents
+    global GENFASTSIM_PNFSLocation
+    global GENFASTSIM_jobEff
+    global GENFASTSIM_LHEFiles
 
-    sim = GENSIMProducer(timestamp,workingDir_sim,log)
+    sim = GENFASTSIMProducer(timestamp,workingDir_sim,log,setarchitecture)
  
-    sim.createConfig(publish_sim,options.configfile,gt_sim,options.lhedir,options.nEvents)
+    sim.createConfig(publish_sim,options.configfile,gt_sim,options.lhedir,options.nEvents,options.campaign)
 
     crab = CRABHandler(timestamp,workingDir_sim,log)
 
@@ -205,16 +197,17 @@ def processGENSIM():
 
     crab.AdditionalCrabInput = sim.getlhefiles()
 
-    crab.createCRABcfg("crab_gensim_"+timestamp+".cfg",
+    crab.createCRABcfg("crab_genfastsim_"+timestamp+".cfg",
                    publish_sim+"_"+options.campaign+"_"+timestamp,
                    sim.getConfigFileName(),
                    sim.getOutputFileName(),
-                   "GENSIM",
+                   "GENFASTSIM",
                    bool(True),
                    "",
                    "",
                    bool(False))
-
+    #the 'publish' argument set to bool(False) does not work yet, crabhandler encounters a problem because it wants to split "None" (the dataset when doing GEN-FASTSIM) into several pieces divided by "/" (as in a normal DAS dataset)...
+    
     crab.setForceWhiteList(bool(True))
 
     if not doDry:
@@ -228,137 +221,40 @@ def processGENSIM():
         
         crab.checkJobs()
         
-        time.sleep(60) # to be shure the jobs are in done status
+        time.sleep(60) # to be sure the jobs are in done status
 
-        GENSIM_CFFPath = workingDir_sim+"/"+sim.getConfigFileName()
+        GENFASTSIM_CFFPath = workingDir_sim+"/"+sim.getConfigFileName()
 
-        GENSIM_LHEFiles = sim.getlhefiles()
+        GENFASTSIM_LHEFiles = sim.getlhefiles()
         
-        GENSIM_PublishName = crab.publishDataSet()
+        GENFASTSIM_PublishName = crab.publishDataSet()
 
-        GENSIM_nEvents = crab.checkFJR()
+        GENFASTSIM_nEvents = crab.checkFJR()
 
-        GENSIM_PNFSLocation = crab.getOutputLocation()
+        GENFASTSIM_PNFSLocation = crab.getOutputLocation()
 
-        GENSIM_jobEff = crab.getJobEff()
+        GENFASTSIM_jobEff = crab.getJobEff()
+				
+				#remove sandbox (lhe files are compressed, but can be sizable when you have a lot of lhe files and tasks: better clean up when a task is done)
+        log.output("--> Removing task sandbox ")
+        rmcmd = 'rm '+workingDir_sim+'/'+crab.UIWorkingDir+'/share/*.tgz'
+        Popen(rmcmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
 
-        log.output("--> Job Efficiency: "+str(GENSIM_jobEff))
+        log.output("--> Job Efficiency: "+str(GENFASTSIM_jobEff))
 
     endTime = gmtime()
 
-    log.output("--> The GEN-SIM production took "+ str((time.mktime(endTime)-time.mktime(startTime))/3600.0)+" hours.")
+    log.output("--> The GEN-FASTSIM production took "+ str((time.mktime(endTime)-time.mktime(startTime))/3600.0)+" hours.")
 
-    log.appendToMSG("\n* GEN-SIM production information: ")
+    log.appendToMSG("\n* GEN-FASTSIM production information: ")
     
     if not crab.getOutputLocation() == "":
 
-        log.appendToMSG("\n\t-> Data location: "+GENSIM_PNFSLocation+"\n")
+        log.appendToMSG("\n\t-> Data location: "+GENFASTSIM_PNFSLocation+"\n")
 
-    log.appendToMSG("\t-> DataSet was published in DBS as: "+GENSIM_PublishName)
+    log.appendToMSG("\t-> DataSet was published in DBS as: "+GENFASTSIM_PublishName)
         
-    log.appendToMSG("\t-> Number of events processed: "+str(GENSIM_nEvents))
-
-
-def processRECO():
-
-    log.output(" ----> Preparing to produce the RECO sample <----")
-
-    startTime = gmtime()
-
-    global workingDir_rec
-    global doDry
-    global options
-
-    global cmssw_rec
-    global gt_rec
-    global publish_rec
-
-    global RECO_GENSrc
-    global RECO_CFFPath
-    global RECO_PublishName
-    global RECO_nEvents
-    global RECO_PNFSLocation
-    global RECO_jobEff
-    global RECO_SIMDataset
-
-    rec = RECOProducer(timestamp,workingDir_rec,log)
- 
-    rec.createConfig(options.campaign,gt_rec)
-
-    crab = CRABHandler(timestamp,workingDir_rec,log)
-        
-    crab.nEvents = "-1" #str(options.nEvents)
-    crab.nEventsPerJob = "500"
-
-    crab.setDBSInst(options.dbsInst)
-
-    if options.startFromSim == None:
-        crab.createCRABcfg("crab_reco_"+timestamp+".cfg",
-                           GENSIM_PublishName,
-                           rec.getConfigFileName(),
-                           rec.getOutputFileName(),
-                           "RECO",
-                           bool(True),
-                           "",
-                           "",
-                           bool(False))
-        RECO_SIMDataset = GENSIM_PublishName
-    else:
-        crab.createCRABcfg("crab_reco_"+timestamp+".cfg",
-                           options.startFromSim,
-                           rec.getConfigFileName(),
-                           rec.getOutputFileName(),
-                           "RECO",
-                           bool(True),
-                           "",
-                           "",
-                           bool(False))
-        RECO_SIMDataset = options.startFromSim
-    
-    if not doDry:
-        
-        crab.submitJobs()
-
-        nEventsDBS = crab.getnEventsDBS()
-
-        #crab.idleTime = int(60)
-        #crab.idleTimeResubmit = int(120)
-        
-        crab.checkJobs()
-        
-        time.sleep(60) # to be shure the jobs are in done status
-
-        RECO_CFFPath = rec.getConfigFileName()
-        
-        RECO_PublishName = crab.publishDataSet()
-
-        RECO_nEvents = crab.checkFJR()
-
-        RECO_PNFSLocation = crab.getOutputLocation()
-
-        RECO_jobEff = crab.getJobEff()
-
-        log.output("--> Job Efficiency: "+str(RECO_jobEff))
-
-    endTime = gmtime()
-
-    log.output("--> The RECO production took "+ str((time.mktime(endTime)-time.mktime(startTime))/3600.0)+" hours.")
-
-    log.appendToMSG("\n* RECO production information: ")
-
-    if options.startFromSim == None:
-
-        log.appendToMSG("\n\t-> GEN-SIM Dataset: "+GENSIM_PublishName+"\n")
-    else:
-        log.appendToMSG("\n\t-> GEN-SIM Dataset: "+options.startFromSim+"\n")
-
-    if not crab.getOutputLocation() == "":
-
-        log.appendToMSG("\n\t-> Data location: "+RECO_PNFSLocation+"\n")
-
-    log.appendToMSG("\t-> DataSet was published in DBS as: "+RECO_PublishName)
-        
-    log.appendToMSG("\t-> Number of events processed: "+str(RECO_nEvents))
+    log.appendToMSG("\t-> Number of events processed: "+str(GENFASTSIM_nEvents))
 
 def announceDataSet():
 
@@ -374,20 +270,23 @@ def announceDataSet():
     global timestamp
 
     mail = MailHandler()
+		
+    mail.toAnnounce = [ "gvonsem@vub.ac.be" ]
+    mail.toError = [ "gvonsem@vub.ac.be" ]
 
     type = "announcement"
 
-    subject = "New simulation production"
+    subject = "New fast simulation production"
 
     msg = "Dear top quark group,\n"
     msg += "\n"
-    msg += "This is an automatically generated e-mail to announce that a GEN-SIM/DIGI-RECO production is completed."
+    msg += "This is an automatically generated e-mail to announce that a GEN-FASTSIM-HLT production is completed."
 
     msg += log.getAnnouncementMSG()
 
     msg += "\n\nMore information on this production can be found on https://mtop.iihe.ac.be/TopDB."
 
-    msg += "\n\n\nCheers,\nThe GEN-SIM-DIGI-RECOProduction team"
+    msg += "\n\n\nCheers,\nThe GEN-FASTSIMProduction team"
    
     mail.sendMail(type,subject,msg)
 
@@ -405,12 +304,12 @@ def updateTopDB(type): # type = pat or toptree
     global cmssw_sim
     global gt_sim
     global publish_sim
-    global GENSIM_CFFPath
-    global GENSIM_PublishName
-    global GENSIM_nEvents
-    global GENSIM_PNFSLocation
-    global GENSIM_jobEff
-    global GENSIM_LHEFiles
+    global GENFASTSIM_CFFPath
+    global GENFASTSIM_PublishName
+    global GENFASTSIM_nEvents
+    global GENFASTSIM_PNFSLocation
+    global GENFASTSIM_jobEff
+    global GENFASTSIM_LHEFiles
     
     db = topDBInterface()
 
@@ -420,15 +319,11 @@ def updateTopDB(type): # type = pat or toptree
     pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     dir = pExe.stdout.read()
 
-    ## insert GENSIM into topDB
-
-    if type == "GENSIM":
-
-        db.insertGENSIM("TopTree Producer",GENSIM_PublishName,GENSIM_PNFSLocation,cmssw_sim,gt_sim,GENSIM_CFFPath,GENSIM_LHEFiles,GENSIM_jobEff,GENSIM_nEvents,options.campaign)
-
-    elif type == "RECO":
-
-        db.insertRECO("TopTree Producer",RECO_SIMDataset,RECO_PublishName,RECO_PNFSLocation,cmssw_rec,gt_rec,RECO_CFFPath,RECO_jobEff,RECO_nEvents,options.campaign)
+    ## insert GENFASTSIM into topDB
+    print GENFASTSIM_jobEff
+    if type == "GENFASTSIM":
+        print GENFASTSIM_PublishName
+        db.insertGENFASTSIM("TopTree Producer",GENFASTSIM_PublishName,GENFASTSIM_PNFSLocation,cmssw_sim,gt_sim,GENFASTSIM_CFFPath,GENFASTSIM_LHEFiles,GENFASTSIM_jobEff,GENFASTSIM_nEvents,options.campaign)
     
 ###################
 ## OPTION PARSER ##
@@ -438,34 +333,25 @@ def updateTopDB(type): # type = pat or toptree
 optParser = OptionParser()
 
 optParser.add_option("-c", "--cmssw", dest="cmssw_ver",
-                  help="Specify which CMSSW releases you want to use for GEN-SIM, DIGI-RECO and TopTree (separated by ',')", metavar="")
+                  help="Specify which CMSSW releases you want to use for GEN-FASTSIM and TopTree (separated by ',')", metavar="")
 
 optParser.add_option("-g","--globaltag", dest="GlobalTag",
-                     help="Specify which GlobalTags you want to use for GEN-SIM, DIGI-RECO and TopTree (separated by ',')", metavar="")
+                     help="Specify which GlobalTags you want to use for GEN-FASTSIM and TopTree (separated by ',')", metavar="")
 
 optParser.add_option("-f","--configfile", dest="configfile",
-                     help="Specify the config template filename inside Configuration/GenProduction/python/ you want to use for GEN-SIM. ", metavar="")
+                     help="Specify the config template filename inside Configuration/GenProduction/python/EightTeV you want to use for GEN-FASTSIM. ", metavar="")
 
 optParser.add_option("-d","--lhedir", dest="lhedir",
-                     help="Specify the directory containing your LHE files for GEN-SIM. ", metavar="")
+                     help="Specify the directory containing your LHE files for GEN-FASTSIM. ", metavar="")
 
 optParser.add_option("-p", "--publish-name", dest="publish",
-                  help="Specify the DAS publication name for the GEN-SIM and DIGI-RECO step (separated by ',')", metavar="")
+                  help="Specify the DAS publication name for the GEN-FASTSIM", metavar="")
 
-optParser.add_option("-a", "--campaign", dest="campaign",default="Summer11",
-                  help="Specify the name of the production campaign (e.g.: Summer11,Fall11,....)", metavar="")
-
-optParser.add_option("-r", "--start-from-produced-sim", dest="startFromSim",
-                  help="Specify DAS dataset name of the GEN-SIM dataset you want to DIGI-RECO", metavar="")
-
-optParser.add_option("-s", "--skip-reco", action="store_true", dest="skipreco",default=bool(False),
-                  help="Use this flag to perform the GEN-SIM step only", metavar="")
+optParser.add_option("-a", "--campaign", dest="campaign",default="Summer12",
+                  help="Specify the name of the production campaign (e.g.: Summer12,...)", metavar="")
 
 optParser.add_option("-n","--nevents", dest="nEvents",default=-1,
                      help="Process only N events. ", metavar="")
-
-optParser.add_option("","--dbsInst", dest="dbsInst",default="cms_dbs_ph_analysis_02",
-                     help="Specify the DBSInstance to perform DBS queries for RECO step", metavar="")
 
 optParser.add_option("","--dry-run", action="store_true", dest="dryRun",default=bool(False),
                      help="Perform a Dry Run (e.g.: no real submission)", metavar="")
@@ -486,16 +372,17 @@ if options.GlobalTag == None:
     optParser.error("Please specify at least one GlobalTag. \n")
 
 if options.publish == None:
-    optParser.error("Please specify at least one DAS PublishName. \n")
+    optParser.error("Please specify the DAS PublishName. \n")
 
-if options.configfile == None and options.startFromSim == None:
-    optParser.error("Please specify the config template filename for GEN-SIM. \n")
+if options.configfile == None:
+    optParser.error("Please specify the config template filename for GEN-FASTSIM. \n")
 
-if options.lhedir == None and options.startFromSim == None:
-    optParser.error("Please specify the directory containing your LHE files for GEN-SIM. \n")
+if options.lhedir == None:
+    optParser.error("Please specify a directory containing your LHE files for GEN-FASTSIM. \n")
 
-if not len(options.publish.split(",")) == 2 and options.startFromSim == None and not options.skipreco:
-    optParser.error("Please specify two DAS PublishNames when running both GEN-SIM and DIGI-RECO. \n")
+#check if LHE directory exists as full path
+if not (os.path.exists(options.lhedir) and os.path.isabs(options.lhedir)):
+    optParser.error("The specified directory with LHE files does not exist. Please specify a directory as full path on the user disk. \n")
 
 
 ######################
@@ -510,9 +397,6 @@ if not options.logFile == "EMPTY":
     logFileName = options.logFile
     
 workingDir_sim = ""
-workingDir_rec = ""
-
-#dbsInst = options.dbsInst
 
 doDry=options.dryRun
 
@@ -521,48 +405,26 @@ doDry=options.dryRun
 cmssw = options.cmssw_ver.split(",")
 
 cmssw_sim = cmssw[0]
-cmssw_rec = ""
 cmssw_toptree = ""
 
 if len(cmssw) > 1:
-    cmssw_rec = cmssw[1]
-if len(cmssw) > 2:
-    cmssw_toptree = cmssw[2]
-
-if not options.startFromSim == None:
-    cmssw_toptree = cmssw_rec
-    cmssw_rec = cmssw_sim
-    cmssw_sim = ""
+    cmssw_toptree = cmssw[1]
     
 # GlobalTags #
 
 gt = options.GlobalTag.split(",")
 
 gt_sim = gt[0]
-gt_rec = ""
 gt_toptree = ""
 
 if len(gt) > 1:
-    gt_rec = gt[1]
-if len(cmssw) > 2:
-    gt_toptree = gt[2]
-
-if not options.startFromSim == None:
-    gt_toptree = gt_rec
-    gt_rec = gt_sim
-    gt_sim = ""
+    gt_toptree = gt[1]
     
 # publish names #
 
 publish = options.publish.split(",")
 
 publish_sim = publish[0]
-
-if options.startFromSim == None and not options.skipreco:
-    publish_rec = publish[1]
-else:
-    publish_rec = publish_sim
-    #publish_sim = ""
     
 #####################
 
@@ -570,22 +432,13 @@ else:
 ## CONTAINERS TO STORE INFO FOR DB ##
 #####################################
 
-#GEN-SIM
-GENSIM_CFFPath = ""
-GENSIM_PublishName = "/a/b/c"
-GENSIM_nEvents = ""
-GENSIM_PNFSLocation = ""
-GENSIM_jobEff = ""
-GENSIM_LHEFiles = ""
-
-#RECO
-RECO_GENSrc = ""
-RECO_CFFPath = ""
-RECO_PublishName = ""
-RECO_nEvents = ""
-RECO_PNFSLocation = ""
-RECO_jobEff = ""
-RECO_SIMDataset = ""
+#GEN-FASTSIM
+GENFASTSIM_CFFPath = ""
+GENFASTSIM_PublishName = "/a/b/c"
+GENFASTSIM_nEvents = ""
+GENFASTSIM_PNFSLocation = ""
+GENFASTSIM_jobEff = ""
+GENFASTSIM_LHEFiles = ""
 
 ################
 ## LOG SYSTEM ##
@@ -602,16 +455,16 @@ else:
 #store datasetname for error-messages
 log.setDataSet(options.publish)
 
-if not doDry:
-    log.sendErrorMails=bool(True) # FIXME
+#if not doDry:
+#    log.sendErrorMails=bool(True) # FIXME
 
 ##################
 ## MAIN ROUTINE ##
 ##################
     
-log.output("---------------------------------------")
-log.output("--> Automated SIMULATION production <--")
-log.output("---------------------------------------")
+log.output("--------------------------------------------")
+log.output("--> Automated FAST SIMULATION production <--")
+log.output("--------------------------------------------")
 
 # display input options and do consistency checks
 inputSummary()
@@ -626,24 +479,12 @@ crab.checkCredentials(False)
 
 # create working directories
 if not cmssw_sim == "":
-    workingDir_sim = setupDirs(cmssw_sim+"/src","GEN-SIM_"+publish_sim)
-if not cmssw_rec == "" and not options.skipreco:
-    workingDir_rec = setupDirs(cmssw_rec+"/src","RECO_"+publish_rec)
+    workingDir_sim = setupDirs(cmssw_sim+"/src","GEN-FASTSIM_"+publish_sim)
 
-# GEN-SIM step
+processGENFASTSIM()
 
-if options.startFromSim == None:
-
-    processGENSIM()
-
-    if not options.dryRun:
-        updateTopDB("GENSIM")
-
-if not options.skipreco:
-    processRECO()
-
-    if not options.dryRun:
-        updateTopDB("RECO")
+if not options.dryRun:
+    updateTopDB("GENFASTSIM")
 
 if not doDry:
     
