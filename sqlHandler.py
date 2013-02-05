@@ -243,7 +243,7 @@ class topDBInterface:
 
         self.sql.execQuery()
 
-    def insertGENSIM(self,user,PublishName,PNFSPath,CMSSWver,GlobalTag,CFFPath,LHEList,JobEff,nEvents,cycle):
+    def insertGENFASTSIM(self,user,PublishName,PNFSPath,CMSSWver,GlobalTag,CFFPath,LHEList,JobEff,nEvents,cycle):
 
         values = []
         values.append([])
@@ -284,48 +284,7 @@ class topDBInterface:
 
         self.sql.execQuery()
 
-    def insertRECO(self,user,SIMDataset,PublishName,PNFSPath,CMSSWver,GlobalTag,CFFPath,JobEff,nEvents,cycle):
-
-        values = []
-        values.append([])
-        values[len(values)-1].append("Date")
-        values[len(values)-1].append(datetime.date.today().strftime("%Y-%m-%d"))
-        values.append([])
-        values[len(values)-1].append("User")
-        values[len(values)-1].append(user)
-        values.append([])
-        values[len(values)-1].append("gensim_id")
-        values[len(values)-1].append(self.GenSimID(SIMDataset))
-        values.append([])
-        values[len(values)-1].append("PublishName")
-        values[len(values)-1].append(PublishName)
-        values.append([])
-        values[len(values)-1].append("PNFSPath")
-        values[len(values)-1].append(PNFSPath)
-        values.append([])
-        values[len(values)-1].append("CMSSWver")
-        values[len(values)-1].append(CMSSWver)
-        values.append([])
-        values[len(values)-1].append("GlobalTag")
-        values[len(values)-1].append(GlobalTag)
-        values.append([])
-        values[len(values)-1].append("CffPath")
-        values[len(values)-1].append(CFFPath)
-        values.append([])
-        values[len(values)-1].append("JobEff")
-        values[len(values)-1].append(str(JobEff))
-        values.append([])
-        values[len(values)-1].append("nEvents")
-        values[len(values)-1].append(str(nEvents))
-        values.append([])
-        values[len(values)-1].append("ProductionCycle")
-        values[len(values)-1].append(cycle)
-
-        self.sql.createQuery("INSERT INTO","recos","",values)
-
-        self.sql.execQuery()
-
-    def GenSimID(self,PublishName):
+    def GenFastSimID(self,PublishName):
         
         options="PublishName REGEXP '"+PublishName+"'"
 
