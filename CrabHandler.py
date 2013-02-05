@@ -553,9 +553,10 @@ class CRABHandler:
                             else:
                                 self.output(" ---> Ok, valid Credential was found (Valid for "+str(timeleft[1])+")")
 
-    def pickProxy(self):
+    def pickProxy(self,type):
 
-        #return "" # disable the system
+        if type == "GENFASTSIM":
+            return "" # disable the system
 
         import random
 
@@ -777,13 +778,13 @@ class CRABHandler:
     def createCRABcfg(self,CRABcfgFileName, dataSet, pSet, outputFile,type,publish,blackList,runSelection,forceStandAlone):
 
         # check which proxy to use for submission
-        self.pickProxy()
+        self.pickProxy(type)
 
         #check if it's MC or data
 
         isData = False
 
-        if not type == "GENSIM":
+        if not type == "GENFASTSIM":
 
             if ((dataSet).split("/"))[3].rfind("GEN") == -1 and ((dataSet).split("/"))[3].rfind("SIM") == -1 and ((dataSet).split("/"))[3].rfind("USER") == -1:
                 isData=True
@@ -851,7 +852,7 @@ class CRABHandler:
 
         dataSetSplit = dataSet.split("/");
 
-        if not type == "GENSIM":
+        if not type == "GENFASTSIM":
             self.UIWorkingDir = type+"_"+dataSetSplit[2]+"_"+self.timeStamp
             self.crabFileName = CRABcfgFileName
 
@@ -861,7 +862,7 @@ class CRABHandler:
             
     
         if publish:
-            if type == "GENSIM":
+            if type == "GENFASTSIM":
                 self.publishName=dataSet
             else:
                 self.publishName = type+"_"+dataSetSplit[1]+'_'+dataSetSplit[2]+'_'+self.timeStamp
@@ -869,7 +870,7 @@ class CRABHandler:
             self.doPublish=True
 
 
-        if type == "GENSIM":
+        if type == "GENFASTSIM":
             dataSet="None"
 
         self.output(" ---> #events/job: "+self.nEventsPerJob)
@@ -1195,7 +1196,7 @@ class CRABHandler:
 
         if not whitelist == "":
             self.output(" --> Submitting with whitelist: "+whitelist)
-            whiteListLine=' -GRID.ce_white_list='+whitelist.strip()
+            whiteListLine=' -GRID.se_white_list='+whitelist.strip()
 
         submitLine = "-submit"
         if nCreated > self.nMaxJobsPerSubmit:
