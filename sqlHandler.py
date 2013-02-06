@@ -283,6 +283,38 @@ class topDBInterface:
         self.sql.createQuery("INSERT INTO","gensims","",values)
 
         self.sql.execQuery()
+		
+    def insertDataSet(self,user,inputDataSet,Process,XS,CMSSWversion,DataTier,Availibility):
+
+        values = []
+        values.append([])
+        values[len(values)-1].append("Date")
+        values[len(values)-1].append(datetime.date.today().strftime("%Y-%m-%d"))
+        values.append([])
+        values[len(values)-1].append("User")
+        values[len(values)-1].append(user)
+        values.append([])
+        values[len(values)-1].append("name")
+        values[len(values)-1].append(inputDataSet)
+        values.append([])
+        values[len(values)-1].append("process")
+        values[len(values)-1].append(Process)
+        values.append([])
+        values[len(values)-1].append("XSection")
+        values[len(values)-1].append(XS)
+        values.append([])
+        values[len(values)-1].append("DataTier")
+        values[len(values)-1].append(str(DataTier))
+        values.append([])
+        values[len(values)-1].append("CMSSWversion")
+        values[len(values)-1].append(CMSSWversion)
+        values.append([])
+        values[len(values)-1].append("Availibilty")
+        values[len(values)-1].append(Availibility)
+				
+        self.sql.createQuery("INSERT INTO","datasets","",values)
+        
+        self.sql.execQuery()
 
     def GenFastSimID(self,PublishName):
         
