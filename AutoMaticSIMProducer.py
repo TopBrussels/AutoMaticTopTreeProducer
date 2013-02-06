@@ -216,6 +216,7 @@ def processGENFASTSIM():
 
         nEventsDBS = crab.getnEventsDBS()
 
+        ##for testing
         #crab.idleTime = int(60)
         #crab.idleTimeResubmit = int(120)
         
@@ -324,7 +325,17 @@ def updateTopDB(type): # type = pat or toptree
     if type == "GENFASTSIM":
         print GENFASTSIM_PublishName
         db.insertGENFASTSIM("TopTree Producer",GENFASTSIM_PublishName,GENFASTSIM_PNFSLocation,cmssw_sim,gt_sim,GENFASTSIM_CFFPath,GENFASTSIM_LHEFiles,GENFASTSIM_jobEff,GENFASTSIM_nEvents,options.campaign)
-    
+		    #insert dataset into topDB
+        cmssw_dataset = "CMSSW_53X"
+        if not cmssw_sim.rfind("CMSSW_5_2") == -1:
+            cmssw_dataset = "CMSSW_52X"						
+        elif not cmssw_sim.rfind("CMSSW_5_3") == -1:
+            cmssw_dataset = "CMSSW_53X"
+        else:
+            log.output("--> WARNING: CMSSW version not recognized in database; dataset will be inserted in TopDB as CMSSW_53X!") 
+				
+        db.insertDataSet("TopTree Producer",GENFASTSIM_PublishName,"NewPhysics","1",cmssw_dataset,"AOD","Produced")
+		
 ###################
 ## OPTION PARSER ##
 ###################
