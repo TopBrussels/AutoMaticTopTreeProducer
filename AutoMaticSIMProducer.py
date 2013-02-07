@@ -185,7 +185,7 @@ def processGENFASTSIM():
 
     crab = CRABHandler(timestamp,workingDir_sim,log)
 
-    if options.nEvents == -1 or int(options.nEvents) > int(sim.getNLHEevents()):
+    if options.nEvents == "-1" or int(options.nEvents) > int(sim.getNLHEevents()):
         options.nEvents = sim.getNLHEevents()
 
     crab.nEvents = str(options.nEvents)
