@@ -891,6 +891,9 @@ class CRABHandler:
 	outFile.write('[CMSSW]\n')
 	outFile.write('datasetpath = '+dataSet+'\n')
 
+        if type == "GENFASTSIM":
+            outFile.write('generator = lhe\n')  #'instrumental to properly skip events in the LHE for the job splitting'
+
         if self.dbsInst.rfind("global") == -1:
             outFile.write('dbs_url = https://cmsdbsprod.cern.ch:8443/'+self.dbsInst+'_writer/servlet/DBSServlet\n')
             
