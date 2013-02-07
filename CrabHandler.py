@@ -563,7 +563,7 @@ class CRABHandler:
         availProxy = []
         availProxy.append("") # dhondt cert
 
-        exclude=""
+        exclude="caebergs"
         if os.path.exists(self.proxyDir+"/proxy"):
             for proxy in os.listdir(self.proxyDir+"/proxy"):
                 if not proxy.rfind(".expiresSoon") == -1:
@@ -1421,7 +1421,7 @@ class CRABHandler:
                     whitelist = whitelistConfig.strip()
 
                 if not whitelist == "":
-                    whitelistCMD = "-GRID.ce_white_list="+whitelist
+                    whitelistCMD = "-GRID.se_white_list="+whitelist
                 else:
                     whitelistCMD = ""
                 
