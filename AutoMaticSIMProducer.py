@@ -238,9 +238,11 @@ def processGENFASTSIM():
 				
 				#remove sandbox (lhe files are compressed, but can be sizable when you have a lot of lhe files and tasks: better clean up when a task is done)
         log.output("--> Removing task sandbox ")
-        rmcmd = 'rm '+workingDir_sim+'/'+crab.UIWorkingDir+'/share/*.tgz'
-        Popen(rmcmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
-
+        Popen('rm '+workingDir_sim+'/'+crab.UIWorkingDir+'/share/*.tgz', shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
+        #remove lhe files in crab directory if they were copied when the lhe files in the original lhe directory were gzipped
+        log.output("--> Removing local copied LHE files in directory for crab")
+        Popen('rm '+workingDir_sim+'/*.lhe', shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
+				
         log.output("--> Job Efficiency: "+str(GENFASTSIM_jobEff))
 
     endTime = gmtime()

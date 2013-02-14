@@ -45,7 +45,7 @@ class GENFASTSIMProducer:
         self.log.output("--> Generating GEN-FASTSIM-HLT config with cmsDriver, template: "+template)
 
         if campaign == "Summer12":
-				   cmd="cmsDriver.py Configuration/GenProduction/python/EightTeV/"+template+"  -s GEN,FASTSIM,HLT:5E33v4 --conditions "+GlobalTag+" --beamspot Realistic8TeVCollision --pileup 2012_Startup_inTimeOnly --datamix NODATAMIXER --datatier AODSIM --eventcontent AODSIM --no_exec --filein file:template.lhe"
+				   cmd="cmsDriver.py Configuration/GenProduction/python/EightTeV/"+template+"  -s GEN,FASTSIM,HLT:7E33v2 --conditions "+GlobalTag+" --beamspot Realistic8TeVCollision --pileup 2012_Startup_inTimeOnly --datamix NODATAMIXER --datatier AODSIM --eventcontent AODSIM --no_exec --filein file:template.lhe"
         else:
 				   self.log.output(" ---> ERROR: campaign "+campaign+" not supported. Supported campaigns: Summer12")
 				
@@ -55,16 +55,29 @@ class GENFASTSIMProducer:
 
         out = pExe.stdout.read()
 
-        # replace LHE files in template, only taking 6 now...
-
+        gzipdetected = bool(False)
+				# replace LHE files in template, only taking 6 now...
         for file in os.listdir(LHEDir):
 
             if not file.rfind(".lhe") == -1:
 
                 if len(self.LHEFiles) < 7:
-                    self.LHEFiles.append(file.strip())
+                    if not file.rfind(".lhe.gz") == -1:
+                        self.log.output(" ---> WARNING: gzipped LHE file detected, copying and unzipping in local directory for crab")
+                        Popen("cp "+LHEDir+"/"+file+" "+self.workingDir, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
+                        Popen("gunzip "+self.workingDir+"/"+file, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
+                        filename = (file.split(".gz"))[0].strip()
+                        gzipdetected = True
+                    else:
+                        filename = file.strip()
+										
+                    #self.LHEFiles.append(file.strip())
+                    self.LHEFiles.append(filename)
 
-        #print LHEFiles
+        #print self.LHEFiles
+				
+        if gzipdetected:
+            LHEDir = self.workingDir				
 
         firstFile = bool(True)
         
@@ -109,10 +122,16 @@ class GENFASTSIMProducer:
 
                     if not i == len(self.LHEFiles)-1:
                         files = files+"\t\t'file:"+self.LHEFiles[i]+"',\n"
-                        self.LHEList = self.LHEList+LHEDir+"/"+self.LHEFiles[i]+","
+                        if gzipdetected:
+                           self.LHEList = self.LHEList+self.LHEFiles[i]+","
+                        else:
+                           self.LHEList = self.LHEList+LHEDir+"/"+self.LHEFiles[i]+","
                     else:
                         files = files+"\t\t'file:"+self.LHEFiles[i]+"'\n"
-                        self.LHEList = self.LHEList+LHEDir+"/"+self.LHEFiles[i]
+                        if gzipdetected:
+                           self.LHEList = self.LHEList+self.LHEFiles[i]
+                        else:
+                           self.LHEList = self.LHEList+LHEDir+"/"+self.LHEFiles[i]
 
                 files = files+"\t)\n"
 
