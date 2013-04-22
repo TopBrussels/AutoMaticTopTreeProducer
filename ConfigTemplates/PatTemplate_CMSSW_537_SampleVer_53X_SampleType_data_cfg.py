@@ -43,14 +43,14 @@ process.GlobalTag.globaltag = cms.string('FT_53_V21_AN3::All')
 #### Apply latest J(B)P B-tag calibration ####
 ##############################################
 
-process.GlobalTag.toGet = cms.VPSet(
-  cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_2D_Data53X_v2"),
-       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
-  cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-       tag = cms.string("TrackProbabilityCalibration_3D_Data53X_v2"),
-       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
-)
+#process.GlobalTag.toGet = cms.VPSet(
+#  cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
+#       tag = cms.string("TrackProbabilityCalibration_2D_Data53X_v2"),
+#       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
+#  cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+#       tag = cms.string("TrackProbabilityCalibration_3D_Data53X_v2"),
+#       connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
+#)
 
 ##############################################
 #### Add new retrained CSV b tagging algo ####
