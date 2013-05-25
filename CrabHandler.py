@@ -556,14 +556,14 @@ class CRABHandler:
     def pickProxy(self,type):
 
         if type == "GENFASTSIM":
-            return "" # disable the system
+            return "" # disable the system; take dhondt cert
 
         import random
 
         availProxy = []
-        availProxy.append("") # dhondt cert
+        #availProxy.append("") # dhondt cert
 
-        exclude="caebergs"
+        exclude="proxy_caebergs"
         if os.path.exists(self.proxyDir+"/proxy"):
             for proxy in os.listdir(self.proxyDir+"/proxy"):
                 if not proxy.rfind(".expiresSoon") == -1:
@@ -1729,7 +1729,8 @@ class CRABHandler:
 
             if len(split) > 0 and not self.publishName.rfind("/") == -1:
 
-                part1 = '/pnfs/iihe/cms/store/user/'+self.getUserName()+'/'
+                #genfastsim productions are done with the certificate of Jorgen, and end up in the jdhondt pnfs directory, not dhondt!!
+                part1 = '/pnfs/iihe/cms/store/user/jdhondt/'
                 
                 part2 = split[1]
             
