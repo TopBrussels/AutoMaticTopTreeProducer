@@ -144,8 +144,9 @@ else:
     srm = "srm://maite.iihe.ac.be:8443"
 
     if len(BadFileList)-1 > 0:
-        log.output("-> Let's kill some duplicated files!!!")
+        log.output("-> Let's kill "+str(len(BadFileList))+" duplicated files!!!")
 
+        #sys.exit(1);
     for i in xrange ( len(BadFileList)-1 ):
 
         badFile = BadFileList[i]

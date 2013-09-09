@@ -47,7 +47,7 @@ sql = SQLHandler(dbaseName,login,password,dbaseHost)
 ### MAIN LOOP ###
 #################
 
-if not len(sys.argv) == 3:
+if not len(sys.argv) >= 3:
 
     print "Usage: python updateJSONFile.py <search_string> <new_json_url>"
 
@@ -73,7 +73,7 @@ for i in range(1,len(result)-1):
 
     print "\n   ----> Looking for associated TopTrees for which we can update the JSON"
     
-    sql.createQuery("SELECT","toptrees","id,JSONFile","dataset_id LIKE '"+id+"'")
+    sql.createQuery("SELECT","toptrees","id,JSONFile,PUJSONFile","dataset_id LIKE '"+id+"'")
  
     result2 = sql.execQuery().split('\n')
 
@@ -81,13 +81,22 @@ for i in range(1,len(result)-1):
 
         tid = result2[i].split("\t")[0]
         old = result2[i].split("\t")[1]
+        oldPU = result2[i].split("\t")[2]
 
         if not old == sys.argv[2]:
 
-            ans = str(raw_input('\n    -----> Update TopTree ID '+tid+' (Current: '+old+') (y/n): ')) 
-
+            ans=''
+            if len(sys.argv) > 3:
+                ans = str(raw_input('\n    -----> Update TopTree ID '+tid+' (Current: '+old+', PU: '+oldPU+') (y/n): ')) 
+            else:
+                ans = str(raw_input('\n    -----> Update TopTree ID '+tid+' (Current: '+old+') (y/n): '))
+                
             if ans == "y":
             
+                if len(sys.argv) > 3:
+                    sql.createQuery("UPDATE","toptrees","","SET `PUJSONFile` = '"+sys.argv[3]+"' WHERE `id` = "+str(tid)+" LIMIT 1")
+                    sql.execQuery()
+
                 sql.createQuery("UPDATE","toptrees","","SET `JSONFile` = '"+sys.argv[2]+"' WHERE `id` = "+str(tid)+" LIMIT 1")
 
                 sql.execQuery()
