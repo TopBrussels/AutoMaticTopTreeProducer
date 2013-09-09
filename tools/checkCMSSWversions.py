@@ -68,7 +68,11 @@ for entry in os.listdir(baseDir):
 
             initEnv = 'cd '+baseDir+'/'+entry+'; eval `scramv1 runtime -sh`;'
 
-            cmd = initEnv+"showtags"
+            #print entry
+            if not entry.rfind("CMSSW_5_2_") == -1:
+                initEnv = "export SCRAM_ARCH=\"slc5_amd64_gcc462\";"+initEnv
+
+            cmd = initEnv+"showtags | grep -v ConfigurationFiles"
             pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
             out = pExe.stdout.read().split("\n")
 

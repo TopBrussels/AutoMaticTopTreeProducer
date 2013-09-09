@@ -58,18 +58,31 @@ def rmSRMdir (dir):
 
         log.output("  ---> Going into directory "+dir)
 
-        for i in os.listdir(dir):
-            
+        tmp = os.listdir(dir)
+
+        n = 0
+        
+        for i in tmp:
+
+            n=n+1
+                        
             log.output("   ----> Removing file "+i)
 
             # do the removal
 
-            cmd ='srmrm '+srmHost+dir+'/'+str(i)
-            
+            cmd ='srmrm '+srmHost+dir+'/'+str(i)+' & '        
             pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
             out = pExe.stdout.read()
 
             #print cmd
+
+            if n == 10:
+                cmd2="wait $!; echo done"
+                #print cmd2
+                pExe = Popen(cmd2, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                out = pExe.stdout.read()
+                print out
+                n=0
             
         #log.output("   ----> Removing directory "+dir)
 
@@ -179,6 +192,8 @@ optParser.add_option("","--clean-up", action="store_true", dest="cleanup",defaul
 optParser.add_option("","--assume-yes", action="store_true", dest="assume_yes",default=bool(False),
                      help="Answer yes to all questions", metavar="")
 
+optParser.add_option("","--demo", action="store_true", dest="demo",default=bool(False),
+                     help="If invoked, the remove commands will be put in a list to be mailed to the admins rather than executing them", metavar="")
 
 (options, args) = optParser.parse_args()
 
@@ -218,6 +233,12 @@ log = logHandler("")
 crab = CRABHandler("","",log)
 
 crab.checkGridProxy(False)
+
+
+
+#rmSRMdir("/pnfs/iihe/cms/store/user/dhondt/QCD_Pt-20to30_EMEnriched_TuneZ2_7TeV-pythia6/Spring11-PU_S1_START311_V1G1-v1/29032011_213110/TOPTREE")
+
+#sys.exit(1)
 
 #### Remove DataSet -> ALL associated PatTuples -> All associated TopTrees
 
@@ -397,6 +418,8 @@ if options.cleanup:
 
     for i in result2:
 
+        continue # for now to protect samples for M. Segala
+
         if i == "" or not i.rfind("id") == -1:  continue
 
         tmpid = i.split("\t")[0]
@@ -431,6 +454,8 @@ if options.cleanup:
     basedir=(Popen("echo $HOME", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()).strip()+"/AutoMaticTopTreeProducer/"
     
     for dir in os.listdir(basedir):
+
+        #continue
 
         if dir.rfind("CMSSW_") == -1:
             continue;
@@ -501,7 +526,7 @@ if options.cleanup:
                         if numfiles > 2 and dirName.rfind("Run201") == -1:
 
                             log.output("    ---> Cleaning CRAB stdout files in "+crabdir+" (Age: "+str(time_diff/(3600*24))+" days)")
-                            time.sleep(5)
+                            #time.sleep(5)
                             #print keepstdout
                             keepstderr=keepstdout.split(".stdout")[0]+".stderr"
                             #print keepstderr
@@ -525,7 +550,7 @@ if options.cleanup:
                                 continue
 
                             log.output("    ---> (DATA PRODUCTION) Removing unuseful lines from stdout files in "+crabdir+" (Age: "+str(time_diff/(3600*24))+" days)")
-                            time.sleep(5)
+                            #time.sleep(5)
 
                             for file in os.listdir(crabdir+"/res"):
                                 
@@ -623,7 +648,7 @@ if options.cleanup:
         if not dir.rfind("Skimmed-TopTrees") == -1:
             continue;
 
-        #if dir.rfind("ForthGenertprimebW_M_500_7TeV_madgraph_Summer11_21102011_133607") == -1: continue # this is just to make testing go fast
+        #if dir.rfind("7TeV_T2") == -1: continue # this is just to make testing go fast
         
     #for dir in tmp:
         pExe = Popen("find /pnfs/iihe/cms/store/user/dhondt/"+dir+" -name *.root", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
@@ -750,7 +775,7 @@ else:
         log.output("  ---> Removing PATuple with ID "+str(id[i])+" which has no attached TopTrees")
      
         
-if not options.assume_yes:
+if not options.assume_yes and not options.demo:
     ans = str(raw_input('\n\nDo you want to continue? (y/n): '))
 else:
     ans = "y"
@@ -794,10 +819,18 @@ else:
         print pExe.stdout.read()
 
         log.output("  ---> Removed directory "+i)
-        
+
+    if options.demo:
+         print ""
+         print "Please mail the following to the grid admins"
+         print ""
+
     for i in cleanup_dirsToRemove:
 
-        rmSRMdir(i)
+        if options.demo:
+            print "rm -rfv "+str(i)    
+        else:
+            rmSRMdir(i)
 
     if not options.rmDataSet == "None":
 

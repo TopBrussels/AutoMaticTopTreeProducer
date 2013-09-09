@@ -52,7 +52,7 @@ sql = SQLHandler(dbaseName,login,password,dbaseHost)
 ### METHODS ###
 ###############
 
-def insertDataSet(user,inputDataSet,Process,XS,CMSSWversion,DataTier,Availibility,Recommended):
+def insertDataSet(user,inputDataSet,Process,XS,CMSSWversion,DataTier,Availibility):
 
     # check if dataset exists, else we insert it
     
@@ -85,9 +85,6 @@ def insertDataSet(user,inputDataSet,Process,XS,CMSSWversion,DataTier,Availibilit
     values.append([])
     values[len(values)-1].append("XSection")
     values[len(values)-1].append(XS)
-    values.append([])
-    values[len(values)-1].append("recommended")
-    values[len(values)-1].append(str(Recommended))
     values.append([])
     values[len(values)-1].append("DataTier")
     values[len(values)-1].append(str(DataTier))
@@ -124,15 +121,23 @@ def insertDataSet(user,inputDataSet,Process,XS,CMSSWversion,DataTier,Availibilit
         sql.execQuery()
                      
 
-def insertRequest(inputDataSet,CMSSWversion,GlobalTag,prio,dbsInst,dataTier):
-            
+def insertRequest(inputDataSet,CMSSWversion,GlobalTag,prio,dbsInst,dataTier,runsel):
+
+    global options
+    
     values = []
     values.append([])
     values[len(values)-1].append("DataSet")
     values[len(values)-1].append(inputDataSet)
     values.append([])
+    values[len(values)-1].append("User")
+    values[len(values)-1].append(options.user)
+    values.append([])
     values[len(values)-1].append("DataTier")
     values[len(values)-1].append(dataTier)
+    values.append([])
+    values[len(values)-1].append("RunSelection")
+    values[len(values)-1].append(runsel)
     values.append([])
     values[len(values)-1].append("useLocalDBS")
     values[len(values)-1].append(dbsInst)
@@ -164,6 +169,10 @@ def insertRequest(inputDataSet,CMSSWversion,GlobalTag,prio,dbsInst,dataTier):
 
 optParser = OptionParser()
 
+
+optParser.add_option("-u","--user", dest="user",default="None",
+                     help="Provide your TopDB username", metavar="")
+
 optParser.add_option("","--dataset_file", dest="file",default="None",
                      help="File containing dataset info", metavar="")
 
@@ -175,6 +184,11 @@ optParser.add_option("","--search_dbs", dest="searchDBS",default="None",
 if options.file == "None" and options.searchDBS == "None":
 
     print "For the options look at python addDatSets.py -h"
+    sys.exit(1)
+
+if options.user == "None":
+
+    print "Please provide your username using --user (-u) option"
     sys.exit(1)
 
 ############
@@ -205,13 +219,20 @@ if not options.file == "None":
                 reqPrio=sample[7]
 
                 reqDBSInst = ""
-                if len(sample) > 8:
-                    reqDBSInst = sample[8]
+                runsel = ""
+                
+                if not process == "data":
+                    if len(sample) > 8:
+                        reqDBSInst = sample[8]
+                        
+                else:
+                    if len(sample) > 8:
+                        runsel = sample[8]
                     
                 
-                print "\nAdding sample "+dataset+" (dataTier: "+datatier+" process: "+process+", XS: "+xsect+" pb, CMSSW: "+CMSSW+", requestCMSSW: "+reqCMSSW+", GlobalTag: "+reqTag+", Priority: "+reqPrio+", dbsInstance: "+reqDBSInst+")\n"
+                print "\nAdding sample "+dataset+" (dataTier: "+datatier+" process: "+process+", XS: "+xsect+" pb, CMSSW: "+CMSSW+", requestCMSSW: "+reqCMSSW+", GlobalTag: "+reqTag+", Priority: "+reqPrio+", dbsInstance: "+reqDBSInst+", RunSelection: "+runsel+")\n"
                 
-                insertDataSet("TopTree Producer",dataset,process,xsect,CMSSW,datatier,"Produced","0")
+                insertDataSet("TopTree Producer",dataset,process,xsect,CMSSW,datatier,"Produced")
                 
                 #ans = str(raw_input('\nDo you want to add a request? (y/n): '))
                 ans = "y"
@@ -228,7 +249,7 @@ if not options.file == "None":
     
                 else:
                     
-                    insertRequest(dataset,reqCMSSW,reqTag,reqPrio,reqDBSInst,datatier)
+                    insertRequest(dataset,reqCMSSW,reqTag,reqPrio,reqDBSInst,datatier,runsel)
 
 
             else:

@@ -52,7 +52,7 @@ sql = SQLHandler(dbaseName,login,password,dbaseHost)
 ### METHODS ###
 ###############                   
  
-def insertSimRequest(campaign,CMSSWversion_sim,GlobalTag_sim,Template_sim,PublishName_sim,LHEList,nEvents,prio):
+def insertSimRequest(campaign,CMSSWversion_sim,GlobalTag_sim,Template_sim,PublishName_sim,LHEList,nEvents,prio,email):
 
     global options
     
@@ -78,10 +78,10 @@ def insertSimRequest(campaign,CMSSWversion_sim,GlobalTag_sim,Template_sim,Publis
     values[len(values)-1].append(Template_sim)
     values.append([])
     values[len(values)-1].append("CMSSWver_top")
-    values[len(values)-1].append("")
+    values[len(values)-1].append("-")
     values.append([])
     values[len(values)-1].append("GlobalTag_top")
-    values[len(values)-1].append("")
+    values[len(values)-1].append("-")
     values.append([])
     values[len(values)-1].append("PublishName_sim")
     values[len(values)-1].append(PublishName_sim)
@@ -94,6 +94,9 @@ def insertSimRequest(campaign,CMSSWversion_sim,GlobalTag_sim,Template_sim,Publis
     values.append([])
     values[len(values)-1].append("Priority")
     values[len(values)-1].append(prio)
+    values.append([])
+    values[len(values)-1].append("email")
+    values[len(values)-1].append(email)
     values.append([])
     values[len(values)-1].append("Status")
     values[len(values)-1].append("Pending")
@@ -158,11 +161,12 @@ if not options.file == "None":
                 GlobalTag_sim=sample[5]+"::All"
                 Template_sim=sample[6]
                 prio=sample[7]
+                email=sample[8]
                    
                 
-                print "\nAdding simrequest (PublishName_sim: "+PublishName_sim+", LHEList: "+LHEList+", nEvents: "+nEvents+", campaign: "+campaign+", CMSSWversion_sim: "+CMSSWversion_sim+", GlobalTag_sim: "+GlobalTag_sim+", Template_sim: "+Template_sim+", prio: "+prio+")\n"
+                print "\nAdding simrequest (PublishName_sim: "+PublishName_sim+", LHEList: "+LHEList+", nEvents: "+nEvents+", campaign: "+campaign+", CMSSWversion_sim: "+CMSSWversion_sim+", GlobalTag_sim: "+GlobalTag_sim+", Template_sim: "+Template_sim+", prio: "+prio+", email: "+email+")\n"
                 
-                insertSimRequest(campaign,CMSSWversion_sim,GlobalTag_sim,Template_sim,PublishName_sim,LHEList,nEvents,prio)
+                insertSimRequest(campaign,CMSSWversion_sim,GlobalTag_sim,Template_sim,PublishName_sim,LHEList,nEvents,prio,email)
                 
                 #ans = str(raw_input('\nDo you want to add a request? (y/n): '))
                 ans = "y"
