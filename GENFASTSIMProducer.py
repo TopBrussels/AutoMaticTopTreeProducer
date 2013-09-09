@@ -56,18 +56,28 @@ class GENFASTSIMProducer:
         out = pExe.stdout.read()
 
         gzipdetected = bool(False)
-				# replace LHE files in template, only taking 6 now...
+				# replace LHE files in template, only taking 6 now... -> updated: only 10 (the lhe files are only 50k, in the past 100k, maybe this will work)
         for file in os.listdir(LHEDir):
 
             if not file.rfind(".lhe") == -1:
 
-                if len(self.LHEFiles) < 7:
+                if len(self.LHEFiles) < 12:
                     if not file.rfind(".lhe.gz") == -1:
                         self.log.output(" ---> WARNING: gzipped LHE file detected, copying and unzipping in local directory for crab")
                         Popen("cp "+LHEDir+"/"+file+" "+self.workingDir, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
                         Popen("gunzip "+self.workingDir+"/"+file, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
                         filename = (file.split(".gz"))[0].strip()
                         gzipdetected = True
+			
+                        #do a fix when seed number was not 0: stripping a certain line from the runcard (seed number), in principle also to be done when not using gzipped lhe files for safety; not supported right now...
+                        self.log.output("   -----> Removing random seed line in LHE file...")
+                        origf = open(self.workingDir+"/"+filename,"r")
+                        origlines = origf.readlines()
+                        origf.close()
+                        workingf = open(self.workingDir+"/"+filename,"w")
+                        for line in origlines:
+                           if line.rfind("rnd seed (0=assigned automatically=default)") == -1:
+                               workingf.write(line)
                     else:
                         filename = file.strip()
 										

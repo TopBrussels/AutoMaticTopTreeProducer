@@ -45,6 +45,7 @@ import threading
 class Request:
 
     ID=int(0)
+    Email = ""
     Campaign=""
     CMSSW_sim=""
     GT_sim=""
@@ -118,7 +119,7 @@ class Request:
         gt=self.GT_sim
         publish=self.PublishName_sim
           
-        cmd ="python AutoMaticSIMProducer.py -c "+cmssw+" -g "+gt+" -p "+publish+" -a "+self.Campaign
+        cmd ="python AutoMaticSIMProducer.py -c "+cmssw+" -g "+gt+" -p "+publish+" -a "+self.Campaign+" --email "+self.Email
 
         if not template == "":
             cmd+=template
@@ -207,16 +208,21 @@ class RequestHandler:
         
         self.sql.createQuery("SELECT","simrequests","*","Status = 'Pending' OR Status = 'Queued' ORDER BY `Priority` DESC")
 
-        f = open("sql.out","w")
+        sqlFile="sql_"+str(strftime("%d%m%Y_%H%M%S"))+".out"
+
+        f = open(sqlFile,"w")
         f.write(self.sql.execQuery())
         f.close()
     
-        for res in open("sql.out","r"):
+        for res in open(sqlFile,"r"):
 
             #print res
             
             line = res.split("\n")[0]
             sqlRes = line.split("	")
+	    
+            if len(sqlRes) < 14:
+                continue
 
             for a in xrange(len(sqlRes)):
                 sqlRes[a]=sqlRes[a].split("\n")[0]
@@ -244,8 +250,10 @@ class RequestHandler:
                 if not request.Priority == 0:
 
                     self.requests.append(request)
+		    		    
+                request.Email = sqlRes[13]
 
-        os.remove("sql.out")
+        os.remove(sqlFile)
 
 ################################
 ## WORKER CLASS FOR THREADING ##

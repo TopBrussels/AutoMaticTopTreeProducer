@@ -143,9 +143,9 @@ def inputSummary():
     if not cmssw_sim == "":
 
         if not options.nEvents == -1:
-            log.output("\t* GEN-FASTSIM <-> CMSSW: "+cmssw_sim+" <-> GlobalTag: "+gt_sim+" <-> Publish As: "+publish_sim+" <-> Config Template: "+options.configfile+" <-> #events to process: "+str(options.nEvents)+" *")
+            log.output("\t* GEN-FASTSIM <-> CMSSW: "+cmssw_sim+" <-> GlobalTag: "+gt_sim+" <-> Publish As: "+publish_sim+" <-> Config Template: "+options.configfile+" <-> #events to process: "+str(options.nEvents)+" <-> sending announcement to "+options.email+" *")
         else:
-            log.output("\t* GEN-FASTSIM <-> CMSSW: "+cmssw_sim+" <-> GlobalTag: "+gt_sim+" <-> Publish As: "+publish_sim+" <-> Config Template: "+options.configfile+" <-> #events to process: all *")
+            log.output("\t* GEN-FASTSIM <-> CMSSW: "+cmssw_sim+" <-> GlobalTag: "+gt_sim+" <-> Publish As: "+publish_sim+" <-> Config Template: "+options.configfile+" <-> #events to process: all <-> sending announcement to "+options.email+" *")
 
         checkCMSSW(cmssw_sim,"gen")
 
@@ -198,7 +198,7 @@ def processGENFASTSIM():
     crab.AdditionalCrabInput = sim.getlhefiles()
 
     crab.createCRABcfg("crab_genfastsim_"+timestamp+".cfg",
-                   publish_sim+"_"+options.campaign+"_"+timestamp,
+                   publish_sim+"_"+options.campaign,
                    sim.getConfigFileName(),
                    sim.getOutputFileName(),
                    "GENFASTSIM",
@@ -274,14 +274,18 @@ def announceDataSet():
 
     mail = MailHandler()
 		
-    mail.toAnnounce = [ "gvonsem@vub.ac.be" ]
-    mail.toError = [ "gvonsem@vub.ac.be" ]
+    #mail.toAnnounce = [ "gvonsem@vub.ac.be" ]
+    #mail.toError = [ "gvonsem@vub.ac.be" ]
+    
+    log.output("--> sending to "+options.email)
+    mail.toAnnounce = [ str(options.email) ]
+    mail.toError = [ str(options.email) ]
 
     type = "announcement"
 
     subject = "New fast simulation production"
 
-    msg = "Dear top quark group,\n"
+    msg = "Hi,\n"
     msg += "\n"
     msg += "This is an automatically generated e-mail to announce that a GEN-FASTSIM-HLT production is completed."
 
@@ -326,7 +330,7 @@ def updateTopDB(type): # type = pat or toptree
     print GENFASTSIM_jobEff
     if type == "GENFASTSIM":
         print GENFASTSIM_PublishName
-        db.insertGENFASTSIM("TopTree Producer",GENFASTSIM_PublishName,GENFASTSIM_PNFSLocation,cmssw_sim,gt_sim,GENFASTSIM_CFFPath,GENFASTSIM_LHEFiles,GENFASTSIM_jobEff,GENFASTSIM_nEvents,options.campaign)
+        db.insertGENFASTSIM("TopTree Producer",GENFASTSIM_PublishName.split("\n")[0],GENFASTSIM_PNFSLocation,cmssw_sim,gt_sim,GENFASTSIM_CFFPath,GENFASTSIM_LHEFiles,GENFASTSIM_jobEff,GENFASTSIM_nEvents,options.campaign)
 		    #insert dataset into topDB
         cmssw_dataset = "CMSSW_53X"
         if not cmssw_sim.rfind("CMSSW_5_2") == -1:
@@ -336,7 +340,7 @@ def updateTopDB(type): # type = pat or toptree
         else:
             log.output("--> WARNING: CMSSW version not recognized in database; dataset will be inserted in TopDB as CMSSW_53X!") 
 				
-        db.insertDataSet("TopTree Producer",GENFASTSIM_PublishName,"NewPhysics","1",cmssw_dataset,"AOD","Produced")
+        db.insertDataSet("TopTree Producer",GENFASTSIM_PublishName.split("\n")[0],"NewPhysics","1",cmssw_dataset,"AOD","Produced")
 		
 ###################
 ## OPTION PARSER ##
@@ -375,6 +379,8 @@ optParser.add_option("","--log-stdout", action="store_true", dest="stdout",defau
 optParser.add_option("-l","--setLogFile", dest="logFile",default="EMPTY",
                      help="Choose your own log file name", metavar="")
 
+optParser.add_option("","--email", dest="email",default="gvonsem@vub.ac.be",
+                     help="Change the email address for announcement from GEN-FASTSIM datasets to another email (default = gvonsem@vub.ac.be)", metavar="")
 
 (options, args) = optParser.parse_args()
 

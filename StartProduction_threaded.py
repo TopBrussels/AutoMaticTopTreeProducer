@@ -236,11 +236,11 @@ class RequestHandler:
 
          self.sql.createQuery("SELECT","patuples","dataset_id","name REGEXP '"+name+"' LIMIT 0,1")
 
-         f = open("sql2.out","w")
+         f = open("ttprod_sql2.out","w")
          f.write(self.sql.execQuery())
          f.close()
 
-         lines = open("sql2.out","r").readlines()
+         lines = open("ttprod_sql2.out","r").readlines()
 
          if len(lines) == 2:
 
@@ -254,11 +254,14 @@ class RequestHandler:
         
         self.sql.createQuery("SELECT","requests","*","Status = 'Pending' OR Status = 'Queued' ORDER BY `Priority` DESC")
 
-        f = open("sql.out","w")
+        sqlFile="ttprod_sql_"+str(strftime("%d%m%Y_%H%M%S"))+".out"
+        sqlFile2="ttprod_sql2_"+str(strftime("%d%m%Y_%H%M%S"))+".out"
+        
+        f = open(sqlFile,"w")
         f.write(self.sql.execQuery())
         f.close()
     
-        for res in open("sql.out","r"):
+        for res in open(sqlFile,"r"):
 
             #print res
             
@@ -289,11 +292,11 @@ class RequestHandler:
                     
                     self.sql.createQuery("SELECT","datasets","CMSSWversion,process","name REGEXP '"+request.DataSet+"' LIMIT 0,1")
 
-                    f = open("sql2.out","w")
+                    f = open(sqlFile2,"w")
                     f.write(self.sql.execQuery())
                     f.close()
     
-                    for res in open("sql2.out","r"):
+                    for res in open(sqlFile2,"r"):
                         
                         #print res
 
@@ -314,7 +317,7 @@ class RequestHandler:
                             #print sqlRes[0]
                             #print request.CMSSW_VER
                             
-                    os.remove("sql2.out")
+                    os.remove(sqlFile2)
 
                     # in case we start from pat
 
@@ -327,11 +330,11 @@ class RequestHandler:
                         #print "going from PAT"
                         self.sql.createQuery("SELECT","datasets","CMSSWversion,process","id = '"+str(dataset_id)+"' LIMIT 0,1")
 
-                        f = open("sql2.out","w")
+                        f = open(sqlFile2,"w")
                         f.write(self.sql.execQuery())
                         f.close()
     
-                        for res in open("sql2.out","r"):
+                        for res in open(sqlFile2,"r"):
 
                             #print res
                             line = res.split("\n")[0]
@@ -354,11 +357,11 @@ class RequestHandler:
                                     request.DataTier = "PAT-MC"
                                     
                             
-                        os.remove("sql2.out")
+                        os.remove(sqlFile2)
 
                     self.requests.append(request)
 
-        os.remove("sql.out")
+        os.remove(sqlFile)
 
 ################################
 ## WORKER CLASS FOR THREADING ##
