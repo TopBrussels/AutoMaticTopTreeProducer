@@ -1,0 +1,1 @@
+/TT_TuneZ2_7TeV-powheg-tauola/Summer11-PU_S4_START42_V11-v1/AODSIM:AODSIM:TTJets:157.5:CMSSW_42X:CMSSW_4_2_8_patch5_TopTreeProd_42X_v2--10GeVJetPresel:START42_V14B:6
