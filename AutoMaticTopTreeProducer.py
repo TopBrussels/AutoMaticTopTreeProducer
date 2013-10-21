@@ -246,7 +246,7 @@ def doStartupChecks():
 
     log.output("--> Checking status of CRABServer (not yet implemented)")
 
-    crab = CRABHandler("","",log)
+    crab = CRABHandler("","","",log)
 
     crab.checkGridProxy(False)
 
@@ -275,11 +275,12 @@ def processPAT():
 
     pat = PatProducer(timestamp,workingDir,log);
 
-    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath)
+    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath,options.pat_config)
 
     patCffName = pat.getConfigFileName()
 
-    crab = CRABHandler(timestamp,workingDir,log);
+    #crab = CRABHandler(timestamp,workingDir,log);
+    crab = CRABHandler(options.toptree_ver,timestamp,workingDir,log);
 
     #print "**"+crab.baseDir
     if not dbsInst == "":
@@ -361,11 +362,12 @@ def processTOPTREE():
 
     top = TopTreeProducer(timestamp,workingDir,log)
             
-    top.createTopTreeConfig(options.dataset,dataType,options.doGenEvent,options.GlobalTag,options.cmssw_ver,options.cmssw_ver_sample)
+    top.createTopTreeConfig(options.dataset,dataType,options.doGenEvent,options.GlobalTag,options.cmssw_ver,options.cmssw_ver_sample,options.top_config)
 
     topCffName = top.getConfigFileName()
 
-    crab = CRABHandler(timestamp,workingDir,log);
+    #crab = CRABHandler(timestamp,workingDir,log);
+    crab = CRABHandler(options.toptree_ver,timestamp,workingDir,log);
     
     useDataSet=""
 
@@ -464,7 +466,8 @@ def processPATandTOPTREE():
     
     pat = PatProducer(timestamp,workingDir,log);
 
-    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath)
+#    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath)
+    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath,options.pat_config)
 
     patCffName = pat.getConfigFileName()
 
@@ -472,7 +475,8 @@ def processPATandTOPTREE():
 
     top = TopTreeProducer(timestamp,workingDir,log)
             
-    top.createTopTreeConfig(options.dataset,dataType,options.doGenEvent,options.GlobalTag,options.cmssw_ver,options.cmssw_ver_sample)
+#    top.createTopTreeConfig(options.dataset,dataType,options.doGenEvent,options.GlobalTag,options.cmssw_ver,options.cmssw_ver_sample)
+    top.createTopTreeConfig(options.dataset,dataType,options.doGenEvent,options.GlobalTag,options.cmssw_ver,options.cmssw_ver_sample,options.top_config)
 
     topCffName = top.getConfigFileName()
 
@@ -487,7 +491,8 @@ def processPATandTOPTREE():
 		
 		# create crab cfg
 
-    crab = CRABHandler(timestamp,workingDir,log);
+    #crab = CRABHandler(timestamp,workingDir,log);
+    crab = CRABHandler(options.toptree_ver,timestamp,workingDir,log);
 
     if not dbsInst == "":
 
@@ -622,10 +627,12 @@ def updateTopDB(type): # type = pat or toptree
     
     db = topDBInterface()
         
-    patTAG=""
-    topTAG=""
+    #patTAG=""
+    #topTAG=""
+    patTag = commands.getoutput("cd "+options.cmssw_ver+"/src"+"; git branch | sed -n '/\* /s///p'")
+    topTag = commands.getoutput("cd "+options.cmssw_ver+"/src/TopBrussels/TopTreeProducer"+"; git branch | sed -n '/\* /s///p'")
 
-    cmd ='cd '+workingDir+'; eval `scramv1 runtime -sh`; showtags >> tags'
+    cmd ='cd '+workingDir+'; eval `scramv1 runtime -sh`'
 
     if not workingDir.rfind("CMSSW_5_") == -1:
         log.output("updateTopDB:: CMSSW_5_X_Y release detected, setting scram arch to slc5_amd64_gcc462")
@@ -634,13 +641,13 @@ def updateTopDB(type): # type = pat or toptree
     pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     out = pExe.stdout.read()
 
-    for line in open(workingDir+"/tags","r"):
-        if not line.rfind("PatAlgos") == -1:
-            patTAG=line
-        if not line.rfind("TopTreeProducer") == -1:
-            topTAG=line
+    #for line in open(workingDir+"/tags","r"):
+    #    if not line.rfind("PatAlgos") == -1:
+    #        patTAG=line
+    #    if not line.rfind("TopTreeProducer") == -1:
+    #        topTAG=line
 
-    os.remove(workingDir+"/tags")
+    #os.remove(workingDir+"/tags")
 
     # get current dir
 
@@ -684,10 +691,10 @@ def updateTopDB(type): # type = pat or toptree
     if type == "pat+toptree":
 
         #comment += "\nTopTree Created from PAT in one single run, PAT was not stored!!!!"
-
-        db.insertPatTuple("TopTree Producer",options.dataset,"PaTuple "+timestamp+" Not Published in DBS",patTAG,options.cmssw_ver,"PaTuple not stored on storage",dir+'/'+workingDir+'/'+patCffName,nEventsDBS,nEventsTT,jobEffPat,"PaTuple not stored on storage",CrabJSON,options.RunSelection)
+        print "insert?"
+        #db.insertPatTuple("TopTree Producer",options.dataset,"PaTuple "+timestamp+" Not Published in DBS",patTAG,options.cmssw_ver,"PaTuple not stored on storage",dir+'/'+workingDir+'/'+patCffName,nEventsDBS,nEventsTT,jobEffPat,"PaTuple not stored on storage",CrabJSON,options.RunSelection)
         
-        db.insertTopTree("TopTree Producer",options.dataset,"PaTuple "+timestamp+" Not Published in DBS",options.cmssw_ver,topTAG,topTreeLocation,topTreeLocation,nEventsTT,jobEffTT,dir+'/'+workingDir+'/'+topCffName,comment,ttreeEventContent,CrabJSON,options.RunSelection)
+        #db.insertTopTree("TopTree Producer",options.dataset,"PaTuple "+timestamp+" Not Published in DBS",options.cmssw_ver,topTAG,topTreeLocation,topTreeLocation,nEventsTT,jobEffTT,dir+'/'+workingDir+'/'+topCffName,comment,ttreeEventContent,CrabJSON,options.RunSelection)
 
 def dieOnError(string):
 
@@ -721,16 +728,25 @@ def getAdditionalInputFiles (AdditionalCrabInput):
 # Parse the options
 optParser = OptionParser()
 
+optParser.add_option("", "--pat_cfg", dest="pat_config",default="EMPTY",
+                  help="Specify which configuration file you want to use for PAT production", metavar="")
+
+optParser.add_option("", "--top_cfg", dest="top_config",default="EMPTY",
+                  help="Specify which configuration file you want to use for TOPTREE production", metavar="")
+
+optParser.add_option("-v", "--toptree_ver", dest="toptree_ver",
+                  help="Specify top-tree version for TOPTREE production", metavar="")
+
 optParser.add_option("-c", "--cmssw", dest="cmssw_ver",
                   help="Specify which CMSSW you want to use for production (format CMSSW_X_Y_Z)", metavar="")
 
-optParser.add_option("-p", "--cmssw_sample", dest="cmssw_ver_sample",
+optParser.add_option("-p", "--cmssw_sample", dest="cmssw_ver_sample",default="EMPTY",
                   help="Specify which CMSSW branch was used for sample generation/reconstruction (e.g. CMSSW_36X, CMSSW_38X)", metavar="")
 
 optParser.add_option("-d", "--dataset", dest="dataset",
                   help="Specify which dataset you want to process (format /X/YZ)", metavar="")
 
-optParser.add_option("-g","--globaltag", dest="GlobalTag",default="MC_31X_V2::All",
+optParser.add_option("-g","--globaltag", dest="GlobalTag",default="START53_V23::All",
                      help="Specify the GlobalTag", metavar="")
 
 optParser.add_option("-t","--datatier", dest="DataTier",default="NOTFILLED",
@@ -766,7 +782,7 @@ optParser.add_option("","--pbs-submit", action="store_true", dest="doPBS",defaul
 optParser.add_option("","--dry-run", action="store_true", dest="dryRun",default=bool(False),
                      help="Perform a Dry Run (e.g.: no real submission)", metavar="")
 
-optParser.add_option("","--log-stdout", action="store_true", dest="stdout",default=bool(False),
+optParser.add_option("","--log-stdout", action="store_true", dest="stdout",default=bool(True),
                      help="Write output to stdout and not to logs/log-*.txt", metavar="")
 
 optParser.add_option("","--forceStandAloneCRAB", action="store_true", dest="forceStandAlone",default=bool(False),
@@ -781,8 +797,14 @@ optParser.add_option("-l","--setLogFile", dest="logFile",default="EMPTY",
 
 (options, args) = optParser.parse_args()
 
+import commands
+
+if options.toptree_ver == None:
+    optParser.error("Please specify a top tree production version.\n")
+
 if options.cmssw_ver == None:
-    optParser.error("Please specify a CMSSW version.\n")
+    options.cmssw_ver = commands.getoutput("echo $CMSSW_BASE")
+    #optParser.error("Please specify a CMSSW version.\n")
 
 if options.cmssw_ver_sample == None:
     optParser.error("Please specify a CMSSW version that was used to produce the sample.\n")
@@ -790,6 +812,7 @@ if options.cmssw_ver_sample == None:
 if options.dataset == None:
     optParser.error("Please specify a dataset name.\n")
 
+print options.stdout
 
 ######################
 ## SOME DEFINITIONS ##
@@ -800,6 +823,7 @@ timestamp = strftime("%d%m%Y_%H%M%S")
 logFileName = "logs/log-"+options.dataset.split("/")[1]+"-"+options.dataset.split("/")[2]+timestamp+".txt"
 
 if not options.logFile == "EMPTY":
+    print logFileName
     logFileName = options.logFile
     
 TopTreeProducerDir = "/src/TopBrussels/TopTreeProducer/test/"
@@ -906,7 +930,7 @@ else:
     processPATandTOPTREE()
 
     if not doDry:
-    
+
         updateTopDB("pat+toptree")
 
         announceDataSet()

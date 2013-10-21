@@ -237,7 +237,7 @@ class CrabStatusParser(ContentHandler):
             
 class CRABHandler:
 
-    def __init__ (self,time,base,logHandler):
+    def __init__ (self,ver,time,base,logHandler):
 
         #** USER Settings
 
@@ -282,6 +282,7 @@ class CRABHandler:
         self.baseDir=base
         self.UIWorkingDir=""
         self.crabFileName=""
+        self.toptreeVer=ver
         self.timeStamp=time
         self.publishName=""
         self.doPublish=bool(False)   
@@ -853,7 +854,7 @@ class CRABHandler:
         dataSetSplit = dataSet.split("/");
 
         if not type == "GENFASTSIM":
-            self.UIWorkingDir = type+"_"+dataSetSplit[2]+"_"+self.timeStamp
+            self.UIWorkingDir = type+"_"+dataSetSplit[2]+"_"+self.toptreeVer+"_"+self.timeStamp
             self.crabFileName = CRABcfgFileName
 
         else:
@@ -865,7 +866,7 @@ class CRABHandler:
             if type == "GENFASTSIM":
                 self.publishName=dataSet
             else:
-                self.publishName = type+"_"+dataSetSplit[1]+'_'+dataSetSplit[2]+'_'+self.timeStamp
+                self.publishName = type+"_"+dataSetSplit[1]+'_'+dataSetSplit[2]+'_'+self.toptreeVer+"_"+self.timeStamp
                 
             self.doPublish=True
 
@@ -923,7 +924,7 @@ class CRABHandler:
 	outFile.write('copy_data = 1\n')
 
         if not publish:
-            self.outputlocation = '/pnfs/iihe/cms/store/user/'+self.getUserName()+'/'+dataSetSplit[1]+'/'+dataSetSplit[2]+'/'+self.timeStamp+"/"+type+'\n'
+            self.outputlocation = '/pnfs/iihe/cms/store/user/'+self.getUserName()+'/'+dataSetSplit[1]+'/'+dataSetSplit[2]+'/'+self.toptreeVer+"/"+self.timeStamp+"/"+type+'\n'
 
             if self.doScriptExe and not self.useAltProxy == "":
                 outFile.write('storage_element = maite.iihe.ac.be\n')
@@ -948,7 +949,7 @@ class CRABHandler:
             else:
                 outFile.write('storage_element = T2_BE_IIHE\n')
 
-            outFile.write('user_remote_dir = /'+dataSetSplit[1]+'/'+dataSetSplit[2]+'/'+self.timeStamp+"/"+type+'\n')
+            outFile.write('user_remote_dir = /'+dataSetSplit[1]+'/'+dataSetSplit[2]+'/'+self.toptreeVer+"/"+self.timeStamp+"/"+type+'\n')
             
 
         if publish:
