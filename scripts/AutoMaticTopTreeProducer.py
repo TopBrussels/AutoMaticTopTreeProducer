@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ## This script will automatically process any given dataset into a TopTree
 
 # for command line options
@@ -689,11 +690,11 @@ def updateTopDB(type): # type = pat or toptree
 
     if type == "pat+toptree":
 
-        #comment += "\nTopTree Created from PAT in one single run, PAT was not stored!!!!"
+        comment += "\nTopTree Created from PAT in one single run, PAT was not stored!!!!"
 
-        #db.insertPatTuple("TopTree Producer",options.dataset,"PaTuple "+timestamp+" Not Published in DBS",patTAG,options.cmssw_ver,"PaTuple not stored on storage",dir+'/'+workingDir+'/'+patCffName,nEventsDBS,nEventsTT,jobEffPat,"PaTuple not stored on storage",CrabJSON,options.RunSelection)
+        db.insertPatTuple("TopTree Producer",options.dataset,"PaTuple "+timestamp+" Not Published in DBS",patTAG,options.cmssw_ver,"PaTuple not stored on storage",dir+'/'+workingDir+'/'+patCffName,nEventsDBS,nEventsTT,jobEffPat,"PaTuple not stored on storage",CrabJSON,options.RunSelection)
         
-        #db.insertTopTree("TopTree Producer",options.dataset,"PaTuple "+timestamp+" Not Published in DBS",options.cmssw_ver,topTAG,topTreeLocation,topTreeLocation,nEventsTT,jobEffTT,dir+'/'+workingDir+'/'+topCffName,comment,ttreeEventContent,CrabJSON,options.RunSelection)
+        db.insertTopTree("TopTree Producer",options.dataset,"PaTuple "+timestamp+" Not Published in DBS",options.cmssw_ver,topTAG,topTreeLocation,topTreeLocation,nEventsTT,jobEffTT,dir+'/'+workingDir+'/'+topCffName,comment,ttreeEventContent,CrabJSON,options.RunSelection)
 
 def dieOnError(string):
 

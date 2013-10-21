@@ -99,8 +99,10 @@ class PatProducer:
                 changedOutputFile = bool(True)
             
             elif line.rfind("runOnMC =") == 0:
- 
-                patFile.write('runOnMC = '+runOnMC+'\n') 
+                tmp = "False"
+                if runOnMC == True:
+                   tmp = "True" 
+                patFile.write('runOnMC = '+tmp+'\n') 
 
             # if not, just write the line to the patcfg
             
