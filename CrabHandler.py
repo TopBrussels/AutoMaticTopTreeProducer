@@ -266,6 +266,7 @@ class CRABHandler:
         #** Do NOT touch
 
         pwd = Popen("echo $HOME", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read().strip()
+        self.homeDir = pwd
         self.proxyDir = pwd+"/.globus/.altcert/"
         self.useAltProxy = ""
 
@@ -346,7 +347,7 @@ class CRABHandler:
 
         # get certificate password from config
         password=""
-        for line in open(".config","r"):
+        for line in open(self.homeDir+"/.config","r"):
             if not line.rfind("GridPass") == -1:
                 password = line.split(" ")[1]
                 
@@ -1148,14 +1149,14 @@ class CRABHandler:
 
         # get blacklisted sites from config
         blacklist=""
-        for line in open(".config","r"):
+        for line in open(self.homeDir+"/.config","r"):
             if not line.rfind("GridBlacklist") == -1:
                 blacklist = line.split(" ")[1]
 
         whitelist=""
         if self.forceWhiteList:
             blacklist=""
-            for line in open(".config","r"):
+            for line in open(self.homeDir+"/.config","r"):
                 if not line.rfind("GridWhitelist") == -1:
                     whitelist = line.split(" ")[1]
 
@@ -1377,7 +1378,7 @@ class CRABHandler:
 
                 # get blacklisted sites from config
                 blacklistConfig=""
-                for line in open(".config","r"):
+                for line in open(self.homeDir+"/.config","r"):
                     if not line.rfind("GridBlacklist") == -1:
                         blacklistConfig = line.split(" ")[1]
 
@@ -1385,7 +1386,7 @@ class CRABHandler:
                 whitelistConfig=""
                 if self.forceWhiteList:
                     blacklistConfig=""
-                    for line in open(".config","r"):
+                    for line in open(self.homeDir+"/.config","r"):
                         if not line.rfind("GridWhitelist") == -1:
                             whitelistConfig = line.split(" ")[1]
 
@@ -1516,7 +1517,7 @@ class CRABHandler:
 
                 # get blacklisted sites from config
                 blacklistConfig=""
-                for line in open(".config","r"):
+                for line in open(self.homeDir+"/.config","r"):
                     if not line.rfind("GridBlacklist") == -1:
                         blacklistConfig = line.split(" ")[1]
 
