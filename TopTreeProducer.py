@@ -34,14 +34,14 @@ class TopTreeProducer:
         #print "\n["+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"] "+string
         self.log.output(string)
 
-    def createTopTreeConfig (self,dataSet,type,doGenEvent,globalTag,cmssw_ver,cmssw_ver_sample):
+    def createTopTreeConfig (self,dataSet,type,doGenEvent,globalTag,cmssw_ver,cmssw_ver_sample,top_config):
 
-        cmsswver = int(cmssw_ver.split("_")[1])*100+int(cmssw_ver.split("_")[2])*10+int(cmssw_ver.split("_")[3])
+        #cmsswver = int(cmssw_ver.split("_")[1])*100+int(cmssw_ver.split("_")[2])*10+int(cmssw_ver.split("_")[3])
 
-        if (int(cmssw_ver.split("_")[2]) > 10):
-            cmsswver = int(cmssw_ver.split("_")[1])*1000+int(cmssw_ver.split("_")[2])*10+int(cmssw_ver.split("_")[3])
+        #if (int(cmssw_ver.split("_")[2]) > 10):
+        #    cmsswver = int(cmssw_ver.split("_")[1])*1000+int(cmssw_ver.split("_")[2])*10+int(cmssw_ver.split("_")[3])
 
-        cmsswver_sample = int((cmssw_ver_sample.split("_")[1]).split("X")[0])
+        #cmsswver_sample = int((cmssw_ver_sample.split("_")[1]).split("X")[0])
 
         #print cmsswver_sample
 
@@ -50,7 +50,7 @@ class TopTreeProducer:
 
         self.configFileName =  (dataSet.split("/"))[1]+"-"+ (dataSet.split("/"))[2]+"_"+self.timeStamp+"_TOPTREE_cfg.py"
 
-        self.outputFileName = self.timeStamp+"_TOPTREE.root"
+        self.outputFileName = "TOPTREE.root"
 
         if doGenEvent:
             type = type+"GenEvent"
@@ -59,7 +59,11 @@ class TopTreeProducer:
             type = type+"_"+cmssw_ver.split("--")[1].strip("/")
             
         #if not doGenEvent:
-        templateName = "ConfigTemplates/TopTreeProducerTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
+        #templateName = "ConfigTemplates/TopTreeProducerTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
+        if top_config == "EMPTY":
+            templateName = cmssw_ver+"/src/TopBrussels/TopTreeProducer/prod/TOPTREE_cfg.py"
+        else:
+            templateName = top_config
         #else:
         #templateName = "ConfigTemplates/TopTreeProducerTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"GenEvent_cfg.py"
             
@@ -107,7 +111,7 @@ class TopTreeProducer:
 
                 if not line.rfind("))") == -1: # meaning that the poolsource is one line
 
-                    TTFile.write("process.source = cms.Source(\"PoolSource\",fileNames = cms.untracked.vstring(\'file:"+self.timeStamp+"_PAT.root\'))\n")
+                    TTFile.write("process.source = cms.Source(\"PoolSource\",fileNames = cms.untracked.vstring(\'file:PAT.root\'))\n")
                     inPoolSource=bool(False)
 
                     changedPoolSource = bool(True)
@@ -118,7 +122,7 @@ class TopTreeProducer:
 
                     changedPoolSource = bool(True)
                 
-                    TTFile.write("process.source = cms.Source(\"PoolSource\",fileNames = cms.untracked.vstring(\'file:"+self.timeStamp+"_PAT.root\'))\n")
+                    TTFile.write("process.source = cms.Source(\"PoolSource\",fileNames = cms.untracked.vstring(\'file:PAT.root\'))\n")
 
 
             elif inPoolSource and not line.rfind(")") == -1 and line.rfind("(") == -1 and line.rfind("fileNames") == -1:

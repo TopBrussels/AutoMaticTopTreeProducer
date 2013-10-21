@@ -24,21 +24,19 @@ class PatProducer:
 
         self.initEnv = 'cd '+self.workingDir+'; eval `scramv1 runtime -sh`;'
 
-        self.outputFileName = self.timeStamp+"_PAT.root"
+        self.outputFileName = "PAT.root"
 
     def output(self,string):
 
         #print "\n["+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"] "+string
         self.log.output(string)
 
-    def createPatConfig (self,dataSet,globalTag,type,doGenEvent,cmssw_ver,cmssw_ver_sample,flavourFilterPath):
+    def createPatConfig (self,dataSet,globalTag,type,doGenEvent,cmssw_ver,cmssw_ver_sample,flavourFilterPath,pat_config):
+        #cmsswver = int(cmssw_ver.split("_")[1])*100+int(cmssw_ver.split("_")[2])*10+int(cmssw_ver.split("_")[3])
+        #if (int(cmssw_ver.split("_")[2]) > 10):
+        #    cmsswver = int(cmssw_ver.split("_")[1])*1000+int(cmssw_ver.split("_")[2])*10+int(cmssw_ver.split("_")[3])
 
-        cmsswver = int(cmssw_ver.split("_")[1])*100+int(cmssw_ver.split("_")[2])*10+int(cmssw_ver.split("_")[3])
-
-        if (int(cmssw_ver.split("_")[2]) > 10):
-            cmsswver = int(cmssw_ver.split("_")[1])*1000+int(cmssw_ver.split("_")[2])*10+int(cmssw_ver.split("_")[3])
-
-        cmsswver_sample = int((cmssw_ver_sample.split("_")[1]).split("X")[0])
+        #cmsswver_sample = int((cmssw_ver_sample.split("_")[1]).split("X")[0])
 
         #cmsswver = 220
 
@@ -54,7 +52,11 @@ class PatProducer:
             type = type+"_"+cmssw_ver.split("--")[1].strip("/")
 
         #if not doGenEvent:
-        templateName = "ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
+        #templateName = "ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
+        if pat_config == "EMPTY":
+            templateName = cmssw_ver+"/src/TopBrussels/TopTreeProducer/prod/PAT_cfg.py"
+        else:
+            templateName = pat_config
         #else:
         #templateName = "ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"GenEvent_cfg.py"
 
