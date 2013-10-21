@@ -31,7 +31,7 @@ class PatProducer:
         #print "\n["+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"] "+string
         self.log.output(string)
 
-    def createPatConfig (self,dataSet,globalTag,type,doGenEvent,cmssw_ver,cmssw_ver_sample,flavourFilterPath,pat_config):
+    def createPatConfig (self,dataSet,globalTag,type,doGenEvent,cmssw_ver,cmssw_ver_sample,flavourFilterPath,runOnMC,pat_config):
         #cmsswver = int(cmssw_ver.split("_")[1])*100+int(cmssw_ver.split("_")[2])*10+int(cmssw_ver.split("_")[3])
         #if (int(cmssw_ver.split("_")[2]) > 10):
         #    cmsswver = int(cmssw_ver.split("_")[1])*1000+int(cmssw_ver.split("_")[2])*10+int(cmssw_ver.split("_")[3])
@@ -97,7 +97,11 @@ class PatProducer:
                 patFile.write('process.out.fileName = \"'+self.outputFileName+'\"\n')
 
                 changedOutputFile = bool(True)
-                
+            
+            elif line.rfind("runOnMC =") == 0:
+ 
+                patFile.write('runOnMC = '+runOnMC+'\n') 
+
             # if not, just write the line to the patcfg
             
             else:

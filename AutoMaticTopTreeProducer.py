@@ -275,7 +275,7 @@ def processPAT():
 
     pat = PatProducer(timestamp,workingDir,log);
 
-    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath,options.pat_config)
+    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath,options.runOnMC,options.pat_config)
 
     patCffName = pat.getConfigFileName()
 
@@ -466,8 +466,7 @@ def processPATandTOPTREE():
     
     pat = PatProducer(timestamp,workingDir,log);
 
-#    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath)
-    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath,options.pat_config)
+    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath,options.runOnMC,options.pat_config)
 
     patCffName = pat.getConfigFileName()
 
@@ -691,7 +690,7 @@ def updateTopDB(type): # type = pat or toptree
     if type == "pat+toptree":
 
         #comment += "\nTopTree Created from PAT in one single run, PAT was not stored!!!!"
-        print "insert?"
+
         #db.insertPatTuple("TopTree Producer",options.dataset,"PaTuple "+timestamp+" Not Published in DBS",patTAG,options.cmssw_ver,"PaTuple not stored on storage",dir+'/'+workingDir+'/'+patCffName,nEventsDBS,nEventsTT,jobEffPat,"PaTuple not stored on storage",CrabJSON,options.RunSelection)
         
         #db.insertTopTree("TopTree Producer",options.dataset,"PaTuple "+timestamp+" Not Published in DBS",options.cmssw_ver,topTAG,topTreeLocation,topTreeLocation,nEventsTT,jobEffTT,dir+'/'+workingDir+'/'+topCffName,comment,ttreeEventContent,CrabJSON,options.RunSelection)
@@ -728,6 +727,9 @@ def getAdditionalInputFiles (AdditionalCrabInput):
 # Parse the options
 optParser = OptionParser()
 
+optParser.add_option("", "--runOnMC", dest="runOnMC",default=bool(True),
+                  help="Specify if it is MC or Data", metavar="")
+
 optParser.add_option("", "--pat_cfg", dest="pat_config",default="EMPTY",
                   help="Specify which configuration file you want to use for PAT production", metavar="")
 
@@ -746,7 +748,7 @@ optParser.add_option("-p", "--cmssw_sample", dest="cmssw_ver_sample",default="EM
 optParser.add_option("-d", "--dataset", dest="dataset",
                   help="Specify which dataset you want to process (format /X/YZ)", metavar="")
 
-optParser.add_option("-g","--globaltag", dest="GlobalTag",default="START53_V23::All",
+optParser.add_option("-g","--globaltag", dest="GlobalTag",default="EMPTY",
                      help="Specify the GlobalTag", metavar="")
 
 optParser.add_option("-t","--datatier", dest="DataTier",default="NOTFILLED",
@@ -812,6 +814,16 @@ if options.cmssw_ver_sample == None:
 if options.dataset == None:
     optParser.error("Please specify a dataset name.\n")
 
+### Set the global tag from the dataset name
+if options.GlobalTag == "EMPTY":
+
+    from TopBrussels.TopTreeProducer.Tools.getGlobalTag import getGlobalTagByDataset
+    runOnMC = False
+    if options.runOnMC == True:
+      runOnMC = True
+    print getGlobalTagByDataset( runOnMC, options.dataset)
+    options.GlobalTag = getGlobalTagByDataset( runOnMC, options.dataset)
+    
 print options.stdout
 
 ######################
