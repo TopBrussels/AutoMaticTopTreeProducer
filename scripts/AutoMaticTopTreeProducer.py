@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ## This script will automatically process any given dataset into a TopTree
 
 # for command line options
@@ -728,8 +727,8 @@ def getAdditionalInputFiles (AdditionalCrabInput):
 # Parse the options
 optParser = OptionParser()
 
-optParser.add_option("", "--runOnMC", dest="runOnMC",default=bool(True),
-                  help="Specify if it is MC or Data", metavar="")
+optParser.add_option("","--mc", action="store_true", dest="runOnMC",help="Specify it is MC")
+optParser.add_option("","--data", action="store_false", dest="runOnMC",help="Specify it is Data")
 
 optParser.add_option("", "--pat_cfg", dest="pat_config",default="EMPTY",
                   help="Specify which configuration file you want to use for PAT production", metavar="")
@@ -819,11 +818,11 @@ if options.dataset == None:
 if options.GlobalTag == "EMPTY":
 
     from TopBrussels.TopTreeProducer.Tools.getGlobalTag import getGlobalTagByDataset
-    runOnMC = False
-    if options.runOnMC == True:
-      runOnMC = True
-    print getGlobalTagByDataset( runOnMC, options.dataset)
-    options.GlobalTag = getGlobalTagByDataset( runOnMC, options.dataset)
+    #runOnMC = False
+    #if options.runOnMC == True:
+    #  runOnMC = True
+    #options.GlobalTag = getGlobalTagByDataset( runOnMC, options.dataset)
+    options.GlobalTag = getGlobalTagByDataset( options.runOnMC, options.dataset)
     
 print options.stdout
 
