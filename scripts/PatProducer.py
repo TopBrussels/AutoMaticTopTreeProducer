@@ -43,7 +43,8 @@ class PatProducer:
         #print cmsswver
         #print cmsswver_sample
 
-        self.configFileName =  (dataSet.split("/"))[1]+"-"+ (dataSet.split("/"))[2]+"_"+(globalTag.split("::"))[0]+"_"+self.timeStamp+"_PAT_cfg.py"
+        #self.configFileName =  (dataSet.split("/"))[1]+"-"+ (dataSet.split("/"))[2]+"_"+(globalTag.split("::"))[0]+"_"+self.timeStamp+"_PAT_cfg.py"
+        self.configFileName =  "PAT_cfg.py"
 
         if doGenEvent:
             type = type+"GenEvent"
