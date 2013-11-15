@@ -77,7 +77,8 @@ class GENFASTSIMProducer:
                         workingf = open(self.workingDir+"/"+filename,"w")
                         for line in origlines:
                            if line.rfind("rnd seed (0=assigned automatically=default)") == -1:
-                               workingf.write(line)
+                               if line.rfind("#  Rnd seed ") == -1:
+			       		workingf.write(line)
                     else:
                         filename = file.strip()
 										
