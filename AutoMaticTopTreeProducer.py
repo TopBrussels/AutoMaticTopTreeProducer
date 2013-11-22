@@ -192,34 +192,34 @@ def checkCommandLineOptions(options):
 
         log.output("--> This is a DRY run, no crab jobs will be submitted!!")
 
-def doStartupChecks():
+def doStartupChecks(productionrelease):
 
     global doStartFromPAT
 
     log.output("********** Checking environment **********")
 
-    log.output("--> Checking if you have a "+options.cmssw_ver+" release.")
+    log.output("--> Checking if you have a "+productionrelease+" release.")
 
-    if (os.path.isdir(options.cmssw_ver)):
+    if (os.path.isdir(productionrelease)):
         log.output(" ---> Ok, the release is present!")
-        cmd ='cd '+options.cmssw_ver+'; cmsenv'
+        cmd ='cd '+productionrelease+'/src; cmsenv'
         pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     else:
         log.output(" ---> ERROR: Please scram the proper release first! (Exiting)")
         dieOnError("Environment: resquested CMSSW version is not found in the working directory")
 
-    log.output("--> Checking if "+options.cmssw_ver+" contains the TopTreeProducer package.")
+    log.output("--> Checking if "+productionrelease+" contains the TopTreeProducer package.")
 
-    if (os.path.isdir(options.cmssw_ver+TopTreeProducerDir)):
+    if (os.path.isdir(productionrelease+TopTreeProducerDir)):
         log.output(" ---> Ok, the "+TopTreeProducerDir+" directory exists!")
     else:
         log.output(" ---> ERROR: Please ensure that you have the TopTreeProducer package installed! (Exiting)")
         dieOnError("Environment: resquested CMSSW version does not contain the TopTreeProducer package")
 
 
-    log.output("--> Checking if "+options.cmssw_ver+" contains the PatAlgos package.")
+    log.output("--> Checking if "+productionrelease+" contains the PatAlgos package.")
 
-    if (os.path.isdir(options.cmssw_ver+PatDir)):
+    if (os.path.isdir(productionrelease+PatDir)):
         log.output(" ---> Ok, the "+PatDir+" directory exists!")
     else:
         log.output(" ---> ERROR: Please ensure that you have the PatAlgos package installed! (Exiting)")
@@ -877,9 +877,13 @@ log.output("------------------------------------")
 
 checkCommandLineOptions(options)
 
-doStartupChecks()
+toptreerelease = options.cmssw_ver.split("--")
+productionrelease = "/home/dhondt/ProductionReleases/"+toptreerelease[1]+"/"+toptreerelease[0]
 
-setupDirs(options.cmssw_ver+"/src")
+doStartupChecks(productionrelease)
+
+
+setupDirs(productionrelease+"/src")
 
 #print options.DontStorePAT
 

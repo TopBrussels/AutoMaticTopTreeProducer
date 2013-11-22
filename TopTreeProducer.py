@@ -57,9 +57,13 @@ class TopTreeProducer:
             
         if len(cmssw_ver.split("--")) > 1:
             type = type+"_"+cmssw_ver.split("--")[1].strip("/")
-            
+        toptreerelease = cmssw_ver.split("--")
+        productionrelease = "/home/dhondt/ProductionReleases/"+toptreerelease[1]+"/"+toptreerelease[0]
+        
+        templateName = productionrelease+"/src/TopBrussels/TopTreeProducer/prod/TOPTREE_cfg.py"
+   
         #if not doGenEvent:
-        templateName = "ConfigTemplates/TopTreeProducerTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
+        #templateName = "ConfigTemplates/TopTreeProducerTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
         #else:
         #templateName = "ConfigTemplates/TopTreeProducerTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"GenEvent_cfg.py"
             

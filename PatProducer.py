@@ -53,8 +53,13 @@ class PatProducer:
         if len(cmssw_ver.split("--")) > 1:
             type = type+"_"+cmssw_ver.split("--")[1].strip("/")
 
+
+        toptreerelease = cmssw_ver.split("--")
+        productionrelease = "/home/dhondt/ProductionReleases/"+toptreerelease[1]+"/"+toptreerelease[0]
+    
+	templateName = productionrelease+"/src/TopBrussels/TopTreeProducer/prod/PAT_cfg.py"
         #if not doGenEvent:
-        templateName = "ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
+        #templateName = "ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
         #else:
         #templateName = "ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"GenEvent_cfg.py"
 
