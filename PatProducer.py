@@ -31,7 +31,7 @@ class PatProducer:
         #print "\n["+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"] "+string
         self.log.output(string)
 
-    def createPatConfig (self,dataSet,globalTag,type,doGenEvent,cmssw_ver,cmssw_ver_sample,flavourFilterPath):
+    def createPatConfig (self,dataSet,globalTag,type,doGenEvent,cmssw_ver,cmssw_ver_sample,flavourFilterPath,isnew):
 
         cmsswver = int(cmssw_ver.split("_")[1])*100+int(cmssw_ver.split("_")[2])*10+int(cmssw_ver.split("_")[3])
 
@@ -54,15 +54,15 @@ class PatProducer:
         if len(cmssw_ver.split("--")) > 1:
             type = type+"_"+cmssw_ver.split("--")[1].strip("/")
 
-
-        toptreerelease = cmssw_ver.split("--")
-        productionrelease = "/home/dhondt/ProductionReleases/"+toptreerelease[1]+"/"+toptreerelease[0]
-    
-	templateName = productionrelease+"/src/TopBrussels/TopTreeProducer/prod/PAT_cfg.py"
-        #if not doGenEvent:
-        #templateName = "ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
-        #else:
-        #templateName = "ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"GenEvent_cfg.py"
+        if isnew: 
+            toptreerelease = cmssw_ver.split("--")
+            productionrelease = "/home/dhondt/ProductionReleases/"+toptreerelease[1]+"/"+toptreerelease[0]
+	    templateName = productionrelease+"/src/TopBrussels/TopTreeProducer/prod/PAT_cfg.py"
+        else: 
+            if not doGenEvent:
+               templateName = "ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
+            else:
+               templateName = "ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"GenEvent_cfg.py"
 
         self.output("--> Generating PAT configuration for "+dataSet+" using template "+templateName)
 

@@ -208,7 +208,7 @@ def doStartupChecks(productionrelease):
         log.output(" ---> ERROR: Please scram the proper release first! (Exiting)")
         dieOnError("Environment: resquested CMSSW version is not found in the working directory")
 
-    log.output("--> Checking if "+productionrelease+" contains the TopTreeProducer package.")
+    log.output("--> Checking if "+productionrelease+"/src contains the TopTreeProducer package.")
 
     if (os.path.isdir(productionrelease+TopTreeProducerDir)):
         log.output(" ---> Ok, the "+TopTreeProducerDir+" directory exists!")
@@ -252,7 +252,7 @@ def doStartupChecks(productionrelease):
 
     crab.checkCredentials(False)
 
-def processPAT():
+def processPAT(isnew):
 
     global workingDir
     global dbsInst
@@ -275,7 +275,7 @@ def processPAT():
 
     pat = PatProducer(timestamp,workingDir,log);
 
-    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath)
+    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath,isnew)
 
     patCffName = pat.getConfigFileName()
 
@@ -340,7 +340,7 @@ def processPAT():
         
     log.appendToMSG("\t-> Number of events processed: "+str(nEventsPAT))
         
-def processTOPTREE():
+def processTOPTREE(isnew):
 
     log.output("********** Preparing to produce the TopTree **********")
 
@@ -361,7 +361,7 @@ def processTOPTREE():
 
     top = TopTreeProducer(timestamp,workingDir,log)
             
-    top.createTopTreeConfig(options.dataset,dataType,options.doGenEvent,options.GlobalTag,options.cmssw_ver,options.cmssw_ver_sample)
+    top.createTopTreeConfig(options.dataset,dataType,options.doGenEvent,options.GlobalTag,options.cmssw_ver,options.cmssw_ver_sample,isnew)
 
     topCffName = top.getConfigFileName()
 
@@ -436,7 +436,7 @@ def processTOPTREE():
 
     log.appendToMSG("\t-> Number of events processed: "+str(nEventsTT))
 
-def processPATandTOPTREE():
+def processPATandTOPTREE(isnew):
 
     global workingDir
     global dbsInst
@@ -464,7 +464,7 @@ def processPATandTOPTREE():
     
     pat = PatProducer(timestamp,workingDir,log);
 
-    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath)
+    pat.createPatConfig(options.dataset,options.GlobalTag,dataType,options.doGenEvent,options.cmssw_ver,options.cmssw_ver_sample,options.flavourHistoryFilterPath,isnew)
 
     patCffName = pat.getConfigFileName()
 
@@ -472,7 +472,7 @@ def processPATandTOPTREE():
 
     top = TopTreeProducer(timestamp,workingDir,log)
             
-    top.createTopTreeConfig(options.dataset,dataType,options.doGenEvent,options.GlobalTag,options.cmssw_ver,options.cmssw_ver_sample)
+    top.createTopTreeConfig(options.dataset,dataType,options.doGenEvent,options.GlobalTag,options.cmssw_ver,options.cmssw_ver_sample,isnew)
 
     topCffName = top.getConfigFileName()
 
@@ -879,7 +879,14 @@ log.output("------------------------------------")
 checkCommandLineOptions(options)
 
 toptreerelease = options.cmssw_ver.split("--")
-productionrelease = "/home/dhondt/ProductionReleases/"+toptreerelease[1]+"/"+toptreerelease[0]
+#isnew = checkCMSSWversions.isNewerThan(CMSSW_5_3_12_patch2,  toptreerelease[0])
+isnew = True #this boolean should be defined with a function that checks wether or not the 
+             # release is a version older or more recent than CMSSW_5_3_12_patch2 
+
+if isnew:
+   productionrelease = "/home/dhondt/ProductionReleases/"+toptreerelease[1]+"/"+toptreerelease[0]
+else:
+   productionrelease = "/home/dhondt/AutoMaticTopTreeProducer/"+options.cmssw_ver
 
 doStartupChecks(productionrelease)
 
@@ -892,13 +899,13 @@ if not options.DontStorePAT:
 
     if not doStartFromPAT:
 
-        processPAT()
+        processPAT(isnew)
 
         if not doDry:
 
             updateTopDB("pat");
 
-    processTOPTREE()
+    processTOPTREE(isnew)
 
     if not doDry:
 
@@ -908,7 +915,7 @@ if not options.DontStorePAT:
 
 else:
 
-    processPATandTOPTREE()
+    processPATandTOPTREE(isnew)
 
     if not doDry:
     
