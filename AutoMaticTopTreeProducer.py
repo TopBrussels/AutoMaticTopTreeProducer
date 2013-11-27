@@ -477,7 +477,8 @@ def processPATandTOPTREE():
     topCffName = top.getConfigFileName()
 
     log.output(" ---> will expand the TopTree config before sending it with crab " )
-    cmd2 = 'cd '+options.cmssw_ver+'; eval `scramv1 runtime -sh`; cd -; python '+workingDir+'/'+top.getConfigFileName()+'; mv -v expanded.py '+workingDir+'/'
+    #cmd2 = 'cd '+options.cmssw_ver+'; eval `scramv1 runtime -sh`; cd -; python '+workingDir+'/'+top.getConfigFileName()+'; mv -v expanded.py '+workingDir+'/'
+    cmd2 = 'cd '+productionrelease+"/src"+'; eval `scramv1 runtime -sh`; cd -; python '+workingDir+'/'+top.getConfigFileName()+'; mv -v expanded.py '+workingDir+'/'
     if not workingDir.rfind("CMSSW_5_") == -1:
         log.output("Expanding TopTree config:: CMSSW_5_X_Y release detected, setting scram arch to slc5_amd64_gcc462")
         cmd2 = "export SCRAM_ARCH=\"slc5_amd64_gcc462\";"+cmd2
@@ -730,7 +731,7 @@ optParser.add_option("-p", "--cmssw_sample", dest="cmssw_ver_sample",
 optParser.add_option("-d", "--dataset", dest="dataset",
                   help="Specify which dataset you want to process (format /X/YZ)", metavar="")
 
-optParser.add_option("-g","--globaltag", dest="GlobalTag",default="MC_31X_V2::All",
+optParser.add_option("-g","--globaltag", dest="GlobalTag",default="AUTO",
                      help="Specify the GlobalTag", metavar="")
 
 optParser.add_option("-t","--datatier", dest="DataTier",default="NOTFILLED",

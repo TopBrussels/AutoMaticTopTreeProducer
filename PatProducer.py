@@ -45,7 +45,8 @@ class PatProducer:
         #print cmsswver
         #print cmsswver_sample
 
-        self.configFileName =  (dataSet.split("/"))[1]+"-"+ (dataSet.split("/"))[2]+"_"+(globalTag.split("::"))[0]+"_"+self.timeStamp+"_PAT_cfg.py"
+        #self.configFileName =  (dataSet.split("/"))[1]+"-"+ (dataSet.split("/"))[2]+"_"+(globalTag.split("::"))[0]+"_"+self.timeStamp+"_PAT_cfg.py"
+        self.configFileName =  "PAT_cfg.py"
 
         if doGenEvent:
             type = type+"GenEvent"
@@ -87,13 +88,22 @@ class PatProducer:
             
             # now we just write the line to the patcfg or alter it if needed
 
+            if line.rfind("runOnMC =") == 0:
+                if type.rfind("MC") == 0:
+                  patFile.write("runOnMC = True\n")  
+                else:
+                  patFile.write("runOnMC = False\n")
             # altering is done for: globaltag
-            if line.rfind("process.GlobalTag.globaltag") == 0:
+            elif line.rfind("process.GlobalTag.globaltag = cms.string") > 0:
 
-                patFile.write("process.GlobalTag.globaltag = cms.string(\'"+globalTag+"\')\n")
+                if globalTag != "AUTO":
 
-                changedGlobalTag = bool(True)
-                
+                  patFile.write("process.GlobalTag.globaltag = cms.string(\'"+globalTag+"\')\n")
+
+                  changedGlobalTag = bool(True)
+                else:
+                  patFile.write(line)
+                   
             # altering is done for: globaltag
             elif line.rfind("process.out.fileName") == 0:
                 

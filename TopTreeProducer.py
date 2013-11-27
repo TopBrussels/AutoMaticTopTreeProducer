@@ -48,7 +48,8 @@ class TopTreeProducer:
         #print cmsswver
         #cmsswver = 220
 
-        self.configFileName =  (dataSet.split("/"))[1]+"-"+ (dataSet.split("/"))[2]+"_"+self.timeStamp+"_TOPTREE_cfg.py"
+        #self.configFileName =  (dataSet.split("/"))[1]+"-"+ (dataSet.split("/"))[2]+"_"+self.timeStamp+"_TOPTREE_cfg.py"
+        self.configFileName =  "TOPTREE_cfg.py"
 
         self.outputFileName = self.timeStamp+"_TOPTREE.root"
 
