@@ -89,7 +89,7 @@ def checkCMSSW(ver,type):
 
     if os.path.isdir(ver):
         log.output("\t\t\t---> Ok, the release is present!")
-        cmd = 'cd '+options.cmssw_ver+'; cd src; cmsenv'
+        cmd = 'cd '+ver+'; cd src; cmsenv'
         if not ver.rfind("CMSSW_5_") == -1:
             log.output("\t\t\t---> CMSSW_5_X_Y release, setting scram arch to slc5_amd64_gcc462")
             setarchitecture = "export SCRAM_ARCH=\"slc5_amd64_gcc462\";"
@@ -126,7 +126,7 @@ def checkGT(gt):
     else:
         log.output("\t\t\t---> Ok, "+gt+" is a valid GlobalTag!")
         
-def inputSummary():
+def inputSummary(productionrelease):
 
     global log
     global options
@@ -143,11 +143,11 @@ def inputSummary():
     if not cmssw_sim == "":
 
         if not options.nEvents == -1:
-            log.output("\t* GEN-FASTSIM <-> CMSSW: "+cmssw_sim+" <-> GlobalTag: "+gt_sim+" <-> Publish As: "+publish_sim+" <-> Config Template: "+options.configfile+" <-> #events to process: "+str(options.nEvents)+" <-> sending announcement to "+options.email+" *")
+            log.output("\t* GEN-FASTSIM <-> CMSSW: "+productionrelease+" <-> GlobalTag: "+gt_sim+" <-> Publish As: "+publish_sim+" <-> Config Template: "+options.configfile+" <-> #events to process: "+str(options.nEvents)+" <-> sending announcement to "+options.email+" *")
         else:
-            log.output("\t* GEN-FASTSIM <-> CMSSW: "+cmssw_sim+" <-> GlobalTag: "+gt_sim+" <-> Publish As: "+publish_sim+" <-> Config Template: "+options.configfile+" <-> #events to process: all <-> sending announcement to "+options.email+" *")
+            log.output("\t* GEN-FASTSIM <-> CMSSW: "+productionrelease+" <-> GlobalTag: "+gt_sim+" <-> Publish As: "+publish_sim+" <-> Config Template: "+options.configfile+" <-> #events to process: all <-> sending announcement to "+options.email+" *")
 
-        checkCMSSW(cmssw_sim,"gen")
+        checkCMSSW(productionrelease,"gen")
 
         checkGT(gt_sim)
         
@@ -485,8 +485,11 @@ log.output("--------------------------------------------")
 log.output("--> Automated FAST SIMULATION production <--")
 log.output("--------------------------------------------")
 
+simrelease = cmssw_sim.split("--")
+productionrelease ="/home/dhondt/ProductionReleases/"+simrelease[1]+"/"+simrelease[0]
+
 # display input options and do consistency checks
-inputSummary()
+inputSummary(productionrelease)
 
 # check GRID proxy
 
@@ -498,7 +501,9 @@ crab.checkCredentials(False)
 
 # create working directories
 if not cmssw_sim == "":
-    workingDir_sim = setupDirs(cmssw_sim+"/src","GEN-FASTSIM_"+publish_sim)
+
+
+    workingDir_sim = setupDirs(productionrelease+"/src","GEN-FASTSIM_"+publish_sim)
 
 processGENFASTSIM()
 
