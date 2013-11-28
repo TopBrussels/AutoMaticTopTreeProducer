@@ -715,6 +715,24 @@ def getAdditionalInputFiles (AdditionalCrabInput):
 
     return AdditionalCrabInput
 
+def parseReleaseString(release):
+    #split and remove 'CMSSW'
+    tokens = release.split('_')[1:]
+
+    output = []
+    for t in tokens:
+        try:
+            output.append(int(t))
+        except ValueError:
+            output.append(t)
+    if len(output) < 4:
+        output.append('')
+    return tuple(output[:4])
+
+def isNewerThan(release,gitrelease):
+    #Checks the orders of two releases. If release2 is not set, it is taken as the current release
+    log.output("********** Checking if AutoMaticTopTreeProducer should be CVS/Git based ********** " )
+    return parseReleaseString(release) >= parseReleaseString(gitrelease)
 ###################
 ## OPTION PARSER ##
 ###################
@@ -878,14 +896,16 @@ log.output("------------------------------------")
 
 checkCommandLineOptions(options)
 
+#the CMMSW version comes as CMSSW_X_Y_Z--tag
 toptreerelease = options.cmssw_ver.split("--")
-#isnew = checkCMSSWversions.isNewerThan(CMSSW_5_3_12_patch2,  toptreerelease[0])
-isnew = True #this boolean should be defined with a function that checks wether or not the 
-             # release is a version older or more recent than CMSSW_5_3_12_patch2 
+#Make a boolean  that returns true when the release is a version more recent than CMSSW_5_3_12_patch2 to define the difference between CVS and git
+isnew = isNewerThan(toptreerelease[0],'CMSSW_5_3_12_patch2')
 
 if isnew:
+   log.output("--> AutoMaticTopTreeProducer is Git based")
    productionrelease = "/home/dhondt/ProductionReleases/"+toptreerelease[1]+"/"+toptreerelease[0]
 else:
+   log.output("--> AutoMaticTopTreeProducer is CVS based")
    productionrelease = "/home/dhondt/AutoMaticTopTreeProducer/"+options.cmssw_ver
 
 doStartupChecks(productionrelease)
