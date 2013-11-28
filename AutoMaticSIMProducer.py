@@ -296,7 +296,24 @@ def announceDataSet():
     msg += "\n\n\nCheers,\nThe GEN-FASTSIMProduction team"
    
     mail.sendMail(type,subject,msg)
+def parseReleaseString(release):
+    #split and remove 'CMSSW'
+    tokens = release.split('_')[1:]
 
+    output = []
+    for t in tokens:
+        try:
+            output.append(int(t))
+        except ValueError:
+            output.append(t)
+    if len(output) < 4:
+        output.append('')
+    return tuple(output[:4])
+
+def isNewerThan(release,gitrelease):
+    #Checks the orders of two releases. If release2 is not set, it is taken as the current release
+    log.output("********** Checking if AutoMaticSIMProducer should be CVS/Git based ********** " )
+    return parseReleaseString(release) >= parseReleaseString(gitrelease)
 
 
 ##############################
@@ -485,8 +502,18 @@ log.output("--------------------------------------------")
 log.output("--> Automated FAST SIMULATION production <--")
 log.output("--------------------------------------------")
 
+#the CMMSW version comes as CMSSW_X_Y_Z--tag
 simrelease = cmssw_sim.split("--")
-productionrelease ="/home/dhondt/ProductionReleases/"+simrelease[1]+"/"+simrelease[0]
+
+#Make a boolean  that returns true when the release is a version more recent than CMSSW_5_3_12_patch2 to define the difference between CVS and git
+isnew = isNewerThan(simrelease[0],'CMSSW_5_3_12_patch2')
+
+if isnew:
+   log.output("--> AutoMaticSIMProducer is Git based")
+   productionrelease ="/home/dhondt/ProductionReleases/"+simrelease[1]+"/"+simrelease[0]
+else:
+   log.output("--> AutoMaticSIMProducer is CVS based")
+   productionrelease = "/home/dhondt/AutoMaticTopTreeProducer/"+options.cmssw_ver
 
 # display input options and do consistency checks
 inputSummary(productionrelease)
