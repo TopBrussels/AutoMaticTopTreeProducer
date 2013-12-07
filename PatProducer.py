@@ -59,10 +59,10 @@ class PatProducer:
             productionrelease = "/home/dhondt/ProductionReleases/"+toptreerelease[1]+"/"+toptreerelease[0]
 	    templateName = productionrelease+"/src/TopBrussels/TopTreeProducer/prod/PAT_cfg.py"
         else: 
-            if not doGenEvent:
-               templateName = "ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
-            else:
-               templateName = "ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"GenEvent_cfg.py"
+           # if not doGenEvent:
+            templateName = "/home/dhondt/AutoMaticTopTreeProducer/ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
+           # else:
+           #    templateName = "/home/dhondt/AutoMaticTopTreeProducer/ConfigTemplates/PatTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"GenEvent_cfg.py"
 
         self.output("--> Generating PAT configuration for "+dataSet+" using template "+templateName)
 
@@ -73,8 +73,8 @@ class PatProducer:
         #process.GlobalTag.globaltag = cms.string('START311_V2::All')
 
         # bools to make shure we changed the appropriate things
-        changedGlobalTag=bool(False)
-        changedOutputFile=bool(False)
+        #changedGlobalTag=bool(False)
+        #changedOutputFile=bool(False)
         
         template = open(templateName,"r") # open template
         patFile = open(self.workingDir+"/"+self.configFileName,'w') # open destination pat config
@@ -94,13 +94,13 @@ class PatProducer:
                 else:
                   patFile.write("runOnMC = False\n")
             # altering is done for: globaltag
-            elif line.rfind("process.GlobalTag.globaltag = cms.string") > 0:
+            elif line.rfind("process.GlobalTag.globaltag = cms.string") >= 0:
 
-                if globalTag != "AUTO":
+                if globalTag.rfind("AUTO") == -1 :
 
-                  patFile.write("process.GlobalTag.globaltag = cms.string(\'"+globalTag+"\')\n")
+                  patFile.write("  process.GlobalTag.globaltag = cms.string(\'"+globalTag+"\')\n")
 
-                  changedGlobalTag = bool(True)
+                  #changedGlobalTag = bool(True)
                 else:
                   patFile.write(line)
                    
@@ -109,7 +109,7 @@ class PatProducer:
                 
                 patFile.write('process.out.fileName = \"'+self.outputFileName+'\"\n')
 
-                changedOutputFile = bool(True)
+                #changedOutputFile = bool(True)
                 
             # if not, just write the line to the patcfg
             
@@ -139,11 +139,12 @@ class PatProducer:
 
         # check if all is changed
 
-        if not changedGlobalTag:
-            patFile.write("process.GlobalTag.globaltag = cms.string(\'"+globalTag+"\')\n")
+        # do we need this check? commenting out following lines as I think it is not necessary (Taejeong)
+        #if not changedGlobalTag:
+        #    patFile.write("process.GlobalTag.globaltag = cms.string(\'"+globalTag+"\')\n")
 
-        if not changedOutputFile:
-            patFile.write('process.out.fileName = \"'+self.outputFileName+'\"\n')
+        #if not changedOutputFile:
+        #    patFile.write('process.out.fileName = \"'+self.outputFileName+'\"\n')
 
         template.close()
         patFile.close()

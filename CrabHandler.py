@@ -775,7 +775,7 @@ class CRABHandler:
 
         self.AdditionalCrabInput = "expanded.py"
         
-    def createCRABcfg(self,CRABcfgFileName, dataSet, pSet, outputFile,type,publish,blackList,runSelection,forceStandAlone):
+    def createCRABcfg(self,CRABcfgFileName, dataSet, pSet, outputFile,type,publish,blackList,runSelection,forceStandAlone, toptreeTag):
 
         # check which proxy to use for submission
         self.pickProxy(type)
@@ -948,7 +948,7 @@ class CRABHandler:
             else:
                 outFile.write('storage_element = T2_BE_IIHE\n')
 
-            outFile.write('user_remote_dir = /'+dataSetSplit[1]+'/'+dataSetSplit[2]+'/'+self.timeStamp+"/"+type+'\n')
+            outFile.write('user_remote_dir = /'+dataSetSplit[1]+'/'+dataSetSplit[2]+'/'+toptreeTag+"/"+self.timeStamp+"/"+type+'\n')
             
 
         if publish:

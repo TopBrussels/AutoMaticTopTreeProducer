@@ -63,10 +63,10 @@ class TopTreeProducer:
             productionrelease = "/home/dhondt/ProductionReleases/"+toptreerelease[1]+"/"+toptreerelease[0]
             templateName = productionrelease+"/src/TopBrussels/TopTreeProducer/prod/TOPTREE_cfg.py"
         else: 
-            if not doGenEvent:
-               templateName = "ConfigTemplates/TopTreeProducerTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
-            else:
-               templateName = "ConfigTemplates/TopTreeProducerTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"GenEvent_cfg.py"
+           # if not doGenEvent:
+            templateName = "/home/dhondt/AutoMaticTopTreeProducer/ConfigTemplates/TopTreeProducerTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"_cfg.py"
+           # else:
+           #    templateName = "/home/dhondt/AutoMaticTopTreeProducer/ConfigTemplates/TopTreeProducerTemplate_CMSSW_"+str(cmsswver)+"_SampleVer_"+str(cmsswver_sample)+"X_SampleType_"+type+"GenEvent_cfg.py"
             
         self.output("--> Generating TopTreeProducer configuration for "+dataSet+" using template "+templateName)
     
@@ -136,9 +136,9 @@ class TopTreeProducer:
                 TTFile.write(line)
 
         # check if all is changed
-
-        if not changedGlobalTag:
-            TTFile.write("process.GlobalTag.globaltag = cms.string(\'"+globalTag+"\')\n")
+        # we don't need global tag for top tree anymore (Taejeong)
+        #if not changedGlobalTag:
+        #    TTFile.write("process.GlobalTag.globaltag = cms.string(\'"+globalTag+"\')\n")
 
         if not changedOutputFile:
             TTFile.write('process.analysis.RootFileName = cms.untracked.string(\"'+self.outputFileName+'\")\n')

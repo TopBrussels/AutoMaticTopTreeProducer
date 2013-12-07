@@ -302,7 +302,8 @@ def processPAT(isnew):
                    bool(True),
                    options.CEBlacklist,
                    options.RunSelection,
-                   options.forceStandAlone)
+                   options.forceStandAlone,
+                   toptreeTag)
 
     if not doDry:
         
@@ -397,7 +398,8 @@ def processTOPTREE(isnew):
                        bool(False),
                        options.CEBlacklist,
                        options.RunSelection,
-                       options.forceStandAlone) # empty runselection for top
+                       options.forceStandAlone,
+                       toptreeTag) # empty runselection for top
 
     topTreeLocation = crab.getOutputLocation().split("\n")[0]
         
@@ -515,7 +517,8 @@ def processPATandTOPTREE(isnew):
                        bool(False),
                        options.CEBlacklist,
                        options.RunSelection,
-                       options.forceStandAlone)
+                       options.forceStandAlone,
+                       toptreeTag)
 
     
     topTreeLocation = crab.getOutputLocation().split("\n")[0]
@@ -898,12 +901,17 @@ checkCommandLineOptions(options)
 
 #the CMMSW version comes as CMSSW_X_Y_Z--tag
 toptreerelease = options.cmssw_ver.split("--")
+#top tree tag
+toptreeTag = "" 
+cmsswRelease = ""
 #Make a boolean  that returns true when the release is a version more recent than CMSSW_5_3_12_patch2 to define the difference between CVS and git
-isnew = isNewerThan(toptreerelease[0],'CMSSW_5_3_12_patch2')
+isnew = isNewerThan(cmsswRelease,'CMSSW_5_3_12_patch2')
 
 if isnew:
+   toptreeTag = toptreerelease[1]
+   cmsswRelease = toptreerelease[0]
    log.output("--> AutoMaticTopTreeProducer is Git based")
-   productionrelease = "/home/dhondt/ProductionReleases/"+toptreerelease[1]+"/"+toptreerelease[0]
+   productionrelease = "/home/dhondt/ProductionReleases/"+toptreeTag+"/"+cmsswRelease
 else:
    log.output("--> AutoMaticTopTreeProducer is CVS based")
    productionrelease = "/home/dhondt/AutoMaticTopTreeProducer/"+options.cmssw_ver
