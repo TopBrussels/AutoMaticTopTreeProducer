@@ -97,8 +97,11 @@ class PatProducer:
             elif line.rfind("process.GlobalTag.globaltag = cms.string") >= 0:
 
                 if globalTag.rfind("AUTO") == -1 :
-
-                  patFile.write("  process.GlobalTag.globaltag = cms.string(\'"+globalTag+"\')\n")
+                  
+                  if isnew:
+                    patFile.write("  process.GlobalTag.globaltag = cms.string(\'"+globalTag+"\')\n")
+                  else:
+                    patFile.write("process.GlobalTag.globaltag = cms.string(\'"+globalTag+"\')\n")
 
                   #changedGlobalTag = bool(True)
                 else:

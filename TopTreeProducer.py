@@ -165,13 +165,13 @@ class TopTreeProducer:
         compileDumper = ";export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.; cp ../src/libToto.so .; g++ `root-config --ldflags`  -L `pwd` -l Toto -I `root-config --incdir` `root-config --libs` TopTreeContentDump.C -o TopTreeContentDump; export DCACHE_RAHEAD=\"true\"; export DCACHE_RA_BUFFER=\"2500000\""
         
         testFile = ""
-        
+
         for file in os.listdir(dir):
             
             if not file.rfind(".root") == -1:
                 
                 testFile = file
-                
+
                 break
 
         runDumper = "; srmcp srm://maite.iihe.ac.be:8443"+dir+"/"+testFile+" file:////$(pwd)/"+testFile+"; ./TopTreeContentDump --inputfiles "+testFile+"; rm "+testFile
@@ -190,13 +190,13 @@ class TopTreeProducer:
 	if not self.workingDir.rfind("CMSSW_5_") == -1:
             self.log.output("TopTreeProducer::CMSSW_5_X_Y release detected, setting scram arch to slc5_amd64_gcc462")
             self.initEnv = "export SCRAM_ARCH=\"slc5_amd64_gcc462\";"+self.initEnv        
-    
+   
         cmd = self.initEnv+" ls ; cd ../../../../TopBrussels/TopTreeProducer/src; make; cd ../tools; export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:."+compileDumper+runDumper
 
         #print cmd
 
         #cmd = ""
-        
+
         pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
         out = pExe.stdout.read()
 

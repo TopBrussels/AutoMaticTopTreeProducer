@@ -923,7 +923,8 @@ class CRABHandler:
 	outFile.write('copy_data = 1\n')
 
         if not publish:
-            self.outputlocation = '/pnfs/iihe/cms/store/user/'+self.getUserName()+'/'+dataSetSplit[1]+'/'+dataSetSplit[2]+'/'+self.timeStamp+"/"+type+'\n'
+            outputDir = dataSetSplit[1]+'/'+dataSetSplit[2]+'/'+toptreeTag+"/"+self.timeStamp+"/"+type 
+            self.outputlocation = '/pnfs/iihe/cms/store/user/'+self.getUserName()+'/'+outputDir+'\n'
 
             if self.doScriptExe and not self.useAltProxy == "":
                 outFile.write('storage_element = maite.iihe.ac.be\n')
@@ -948,7 +949,7 @@ class CRABHandler:
             else:
                 outFile.write('storage_element = T2_BE_IIHE\n')
 
-            outFile.write('user_remote_dir = /'+dataSetSplit[1]+'/'+dataSetSplit[2]+'/'+toptreeTag+"/"+self.timeStamp+"/"+type+'\n')
+            outFile.write('user_remote_dir = /'+outputDir+'\n')
             
 
         if publish:

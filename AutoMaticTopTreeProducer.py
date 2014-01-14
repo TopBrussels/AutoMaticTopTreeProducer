@@ -902,17 +902,21 @@ checkCommandLineOptions(options)
 #the CMMSW version comes as CMSSW_X_Y_Z--tag
 toptreerelease = options.cmssw_ver.split("--")
 #top tree tag
-toptreeTag = "" 
-cmsswRelease = ""
+toptreeTag = ""
+#cmsswRelease = ""
+cmsswRelease = toptreerelease[0]
 #Make a boolean  that returns true when the release is a version more recent than CMSSW_5_3_12_patch2 to define the difference between CVS and git
 isnew = isNewerThan(cmsswRelease,'CMSSW_5_3_12_patch2')
 
+
 if isnew:
+   log.output(" ---> new release")
    toptreeTag = toptreerelease[1]
    cmsswRelease = toptreerelease[0]
    log.output("--> AutoMaticTopTreeProducer is Git based")
    productionrelease = "/home/dhondt/ProductionReleases/"+toptreeTag+"/"+cmsswRelease
 else:
+   log.output(" ---> old release")
    log.output("--> AutoMaticTopTreeProducer is CVS based")
    productionrelease = "/home/dhondt/AutoMaticTopTreeProducer/"+options.cmssw_ver
 

@@ -502,18 +502,15 @@ log.output("--------------------------------------------")
 log.output("--> Automated FAST SIMULATION production <--")
 log.output("--------------------------------------------")
 
-#the CMMSW version comes as CMSSW_X_Y_Z--tag
-simrelease = cmssw_sim.split("--")
-
 #Make a boolean  that returns true when the release is a version more recent than CMSSW_5_3_12_patch2 to define the difference between CVS and git
-isnew = isNewerThan(simrelease[0],'CMSSW_5_3_12_patch2')
+isnew = isNewerThan(cmssw_sim,'CMSSW_5_3_12_patch2')
 
 if isnew:
    log.output("--> AutoMaticSIMProducer is Git based")
-   productionrelease ="/home/dhondt/ProductionReleases/"+simrelease[1]+"/"+simrelease[0]
+   productionrelease ="/home/dhondt/ProductionReleases/FastSim/"+cmssw_sim
 else:
    log.output("--> AutoMaticSIMProducer is CVS based")
-   productionrelease = "/home/dhondt/AutoMaticTopTreeProducer/"+options.cmssw_ver
+   productionrelease = "/home/dhondt/AutoMaticTopTreeProducer/"+cmssw_sim
 
 # display input options and do consistency checks
 inputSummary(productionrelease)
