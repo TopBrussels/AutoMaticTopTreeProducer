@@ -61,8 +61,8 @@ import smtplib
 class MailHandler:
 
     def __init__(self,recepient):
-
-        self.smtpServer = "mach.vub.ac.be"
+        self.smtpServer = "cernmxgwlb4.cern.ch"
+#        self.smtpServer = "mach.vub.ac.be"
         #self.smtpServer = "localhost"
 
         self.senderAddress = "toptreeproducer@mtop.iihe.ac.be"
@@ -337,7 +337,7 @@ class SkimTopTree:
                 print "DEBUG: finally running the skim exe"
 
             pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-            pout = pExe.stdout.read()
+            pout = pExe.stdout.readline()
 
             if (debug1):
                 print "DEBUG: with the following output: " + str(pout)
@@ -346,12 +346,18 @@ class SkimTopTree:
                 line = pExe.stdout.readline()
                 if line.strip().rfind("Warning in <TVector3::PseudoRapidity>:") == -1:
                     log.output(line.strip())
-                out.append(line.strip())
+                out.append(line)
                 if not line: break
+           
 
             runOK = bool(False)
 
-            #sys.exit(1)
+            for line in out:
+                if not line.rfind("--> Skimmed") == -1:
+                    splittedLine = line.split(" ")                    
+                    #nOutput += int(splittedLine[2])
+                    #nInput += int(splittedLine[8])
+                    print "incrementing stats" + str(nOutput) + "  " + str(nInput)
 
         else:
 
@@ -366,7 +372,6 @@ class SkimTopTree:
             # copy our temp skimmer dir to localgrid
 
             copy = Popen("cp -vfr "+skimmerDir+" /localgrid/"+userName+"/", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
-
             log.output(copy)
 
             # copy our proxy to localgrid if the WN needs to copy to PNFS
@@ -614,6 +619,7 @@ class SkimTopTree:
                     
                 nOutput += int(splittedLine[2])
                 nInput += int(splittedLine[8])
+                print "incrementing stats"
                     
             if not line.rfind("Code running was succesfull!") == -1 and nInput > 0:
 
