@@ -14,7 +14,7 @@ class MailHandler:
 
     def __init__(self):
 
-        self.smtpServer = "mach.vub.ac.be"
+        self.smtpServer = "smtp.vub.ac.be"
 
         self.senderAddress = "toptreeproducer@mtop.iihe.ac.be"
 

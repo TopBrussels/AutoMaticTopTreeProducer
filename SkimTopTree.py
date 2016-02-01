@@ -61,7 +61,7 @@ import smtplib
 class MailHandler:
 
     def __init__(self,recepient):
-        self.smtpServer = "cernmxgwlb4.cern.ch"
+        self.smtpServer = "smtp.vub.ac.be"
 #        self.smtpServer = "mach.vub.ac.be"
         #self.smtpServer = "localhost"
 
@@ -229,7 +229,7 @@ class SkimTopTree:
             
         if (debug1):
             print "DEBUG1: cd to skimmerDir and ls " + skimmerDir
-        init = initROOT+" export DCACHE_RAHEAD=\"1\"; export DCACHE_RA_BUFFER=\"250000000\"; cd "+skimmerDir+' ls;'
+        init = initROOT+" export DCACHE_RAHEAD=\"1\"; export DCACHE_RA_BUFFER=\"250000000\"; cd "+skimmerDir+'; pwd; ls;'
 
         pExe = Popen(init, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read() # this cleans the directory
         if (debug1):
@@ -295,7 +295,9 @@ class SkimTopTree:
                 print "DEBUG: Not running pbs "   
          
             cmd = init+'rm *.root -v'  
-            pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+            pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True).stdout.read()
+            if (debug1):
+                print "DEBUG: With the output " + pExe
 
             if  options.usesrmcp:
 
@@ -1083,7 +1085,7 @@ cmd = 'pwd'
 pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
 TopSkimDir = pExe.stdout.read().strip()
 debug = False
-debug1 = True
+debug1 = False
 
 # get username
 
