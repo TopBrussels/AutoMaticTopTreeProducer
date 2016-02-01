@@ -1084,8 +1084,8 @@ url = ""
 cmd = 'pwd'
 pExe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
 TopSkimDir = pExe.stdout.read().strip()
-debug = False
-debug1 = False
+debug = True
+debug1 = True
 
 # get username
 
